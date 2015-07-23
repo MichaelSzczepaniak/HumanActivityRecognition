@@ -11,9 +11,9 @@ run_analysis <- function(options = "fromDeparsedData") {
             "HAR data download started...\n")
         getHARData()  # gets the zipped data file, explodes it, and renames dir
         cat(format(Sys.time(), "%T"), "HAR data download complete...\n")
-        createDeparsedXData()  # creates the output directory then
-                               # constructs the xtestdf.R and xtraindf.R
-                               # deparsed dataframes and store them there
+        createRawDeparsedXData()  # creates the output directory then
+                                  # constructs the xtestdf.R and xtraindf.R
+                                  # deparsed dataframes and store them there
         cat(format(Sys.time(), "%T"),
             "Deparsed HAR X data file creations complete...\n")
     } else if(options == "fromDeparsedData") {
@@ -31,9 +31,15 @@ run_analysis <- function(options = "fromDeparsedData") {
     }
     # combine the test and train dataframes, keep the combined and remove
     # what is not longer needed
-    xdata <- bind_rows(xtestdata, xtraindata)
+    xdata <- bind_rows(xtestdata, xtraindata)  # step 1.
+    write.table(xdata, file = paste0(outputDir, "./step1.txt"),
+                row.names = FALSE)
     rm(list = c("xtestdata", "xtraindata"))
-    xdata <- removeNonMeanNonStdDev(xdata)  # step 2
+    xdata <- addOriginalFeaturesAsHeaders(xdata)
+    xdata <- removeNonMeanNonStdDev(xdata)  # step 2.
+    write.table(xdata, file = paste0(outputDir, "./step2.txt"),
+                row.names = FALSE)
+    xdata <- makeDescriptiveColumnNames(xdata)
     # append the subject and activity columns: steps 3 and 4
     xdata <- appendSubjectColumn(xdata)
     xdata <- relabelAndAppendActivites(xdata)
@@ -48,6 +54,7 @@ getHARData <- function (datafile = "data.zip") {
     fileUrl <- "https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip"
     download(fileUrl, destfile=paste0("./", datafile))
     unzip(datafile)
+    # The next line creates concurrency issues
     #file.rename("UCI HAR Dataset", "data")
     #cat(format(Sys.time(), "%T"),
     #    "'UCI HAR Dataset' dir renamed to 'data'...\n")
@@ -69,17 +76,22 @@ loadDirectoryStructure <- function() {
 ## the following locations: ../data/output/xtestdf.R and
 ##                          ../data/output/xtraindf.R
 ## These objects are created to speed future reconstruction of these dataframes.
-createDeparsedXData <- function() {
+createRawDeparsedXData <- function() {
     dir.create(outputDir)
+    cat(format(Sys.time(), "%T"),
+        " Start reading X_test.txt data file into dataframe.\n")
     xtestdata <- readXFromRawData(TRUE)
     cat(format(Sys.time(), "%T"),
-               " Finished reading X_test.txt data file into data frame.\n")
+               " Finished reading X_test.txt data file into dataframe.\n")
+    cat(format(Sys.time(), "%T"),
+        " Start reading X_train.txt data file into dataframe.\n")
     xtraindata <- readXFromRawData(FALSE)
     cat(format(Sys.time(), "%T"),
-        " Finished reading X_test.txt data file into dataframe.\n")
+        " Finished reading X_train.txt data file into dataframe. ",
+        " Start dput of test data.\n")
     dput(xtestdata, file = paste0(outputDir, "/xtestdf.R"))
     cat(format(Sys.time(), "%T"),
-        " Finished dput of xtestdf.R.\n")
+        " Finished dput of xtestdf.R. Start dput of train data.\n")
     dput(xtraindata, file = paste0(outputDir, "/xtraindf.R"))
     cat(format(Sys.time(), "%T"),
         " Finished dput of xtestdf.R.\n")
@@ -123,21 +135,31 @@ readDeparsedXData <- function(testData) {
     return(xdata)
 }
 
-removeNonMeanNonStdDev <- function(xdata) {
+addOriginalFeaturesAsHeaders <- function(xdata) {
     # read in the features.txt which contains the columns variable names
     featuresPath <- paste0(dataDir, "/features.txt")
-    originalColumnNames <- read.table(featuresPath, sep = " ",
-                                      stringsAsFactors = FALSE)[[2]]
-    # assign the original col names so we can see them things lining up
+    # make original names vector available in workspace so that functions 
+    # removeNonMeanNonStdDev and makeDescriptiveColumnNames can use it
+    originalColumnNames <<- read.table(featuresPath, sep = " ",
+                                       stringsAsFactors = FALSE)[[2]]
+    names(xdata) <- originalColumnNames
     
-    
+    return(xdata)
+}
+
+removeNonMeanNonStdDev <- function(xdata) {
     meanIndices <- grep("mean\\(\\)", originalColumnNames)
     stdIndices <- grep("std\\(\\)", originalColumnNames)
-    allIndices <- sort(c(meanIndices, stdIndices))
-    #xDataRevised
+    indicesOfInterest <- sort(c(meanIndices, stdIndices))
+    xdata <- xdata[,indicesOfInterest]
     
+    return(xdata)
+}
+
+makeDescriptiveColumnNames <- function(xdata) {
+    #originalColumnNames
     
-    return(xDataRevised)
+    return(xdata)
 }
 
 ##
