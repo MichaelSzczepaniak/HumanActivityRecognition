@@ -10,7 +10,7 @@ The purpose of this project is to demonstrate the "_ability to collect, work wit
 4. Appropriately labeling the data set with descriptive variable names.
 5. Creating a second independent tidy data set with the average of each variable for each activity and each subject.
 
-The motivation behind this project is that the ability to transform an existing dataset to into one that is tidy, typically consumes a substantial amount of time, is necessary in order to make downstream analysis tractable, and is required by any professional working with large amounts of data.  Therefore, gaining experience in this area serves to enhance future productivity.
+The motivation behind this project is that the ability to transform an existing dataset into one that is tidy typically consumes a substantial amount of time, is necessary in order to make downstream analysis tractable, and is required by any professional working with large amounts of data.  Therefore, gaining experience in this area serves to enhance future productivity.
 
 The project consists of
 
