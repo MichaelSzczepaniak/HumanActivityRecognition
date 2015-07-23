@@ -17,15 +17,29 @@ run_analysis <- function(options = "fromDeparsedData") {
         cat(format(Sys.time(), "%T"),
             "Deparsed HAR X data file creations complete...\n")
     } else if(options == "fromDeparsedData") {
+        cat(format(Sys.time(), "%T"),
+            "reading deparsed HAR dataframes started...\n")
         xtestdata <- readDeparsedXData(TRUE)
-        xtestdata <- readDeparsedXData(FALSE)
+        xtraindata <- readDeparsedXData(FALSE)
+        cat(format(Sys.time(), "%T"),
+            "reading deparsed HAR dataframes complete...\n")
     } else {
         cat("Invalid option. Valid options are:\n")
         cat("fromScratch or fromDeparsedData\n")
         cat("See README.md for details.\n")
         cat("No computation done. Exiting.")
     }
+    # combine the test and train dataframes, keep the combined and remove
+    # what is not longer needed
+    xdata <- bind_rows(xtestdata, xtraindata)
+    rm(list = c("xtestdata", "xtraindata"))
+    xdata <- removeNonMeanNonStdDev(xdata)  # step 2
+    # append the subject and activity columns: steps 3 and 4
+    xdata <- appendSubjectColumn(xdata)
+    xdata <- relabelAndAppendActivites(xdata)
     
+    write.table(xdata, file = paste0(outputDir, "./xTestAndTrain.txt"),
+                row.names = FALSE)
 }
 
 ## Downloads the Human Activity Recognition data, unzips it, renames the
@@ -101,10 +115,41 @@ readXFromRawData <- function(testData) {
 readDeparsedXData <- function(testData) {
     xdata <- NULL
     if(testData) {
-        xdata <- dget(paste0(testDir, "xtestdf.R"))
+        xdata <- dget(paste0(outputDir, "/xtestdf.R"))
     } else {
-        xdata <- dget(paste0(testDir, "xtraindf.R"))
+        xdata <- dget(paste0(outputDir, "/xtraindf.R"))
     }
+    
+    return(xdata)
+}
+
+removeNonMeanNonStdDev <- function(xdata) {
+    # read in the features.txt which contains the columns variable names
+    featuresPath <- paste0(dataDir, "/features.txt")
+    originalColumnNames <- read.table(featuresPath, sep = " ",
+                                      stringsAsFactors = FALSE)[[2]]
+    # assign the original col names so we can see them things lining up
+    
+    
+    meanIndices <- grep("mean\\(\\)", originalColumnNames)
+    stdIndices <- grep("std\\(\\)", originalColumnNames)
+    allIndices <- sort(c(meanIndices, stdIndices))
+    #xDataRevised
+    
+    
+    return(xDataRevised)
+}
+
+##
+appendSubjectColumn <- function(xdata) {
+    
+    
+    return(xdata)
+}
+
+## 
+relabelAndAppendActivites <- function(xdata) {
+    
     
     return(xdata)
 }
