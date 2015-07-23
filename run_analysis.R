@@ -39,13 +39,19 @@ run_analysis <- function(options = "fromDeparsedData") {
     xdata <- removeNonMeanNonStdDev(xdata)  # step 2.
     write.table(xdata, file = paste0(outputDir, "./step2.txt"),
                 row.names = FALSE)
-    xdata <- makeDescriptiveColumnNames(xdata)
-    # append the subject and activity columns: steps 3 and 4
-    xdata <- appendSubjectColumn(xdata)
-    xdata <- relabelAndAppendActivites(xdata)
-    
-    write.table(xdata, file = paste0(outputDir, "./xTestAndTrain.txt"),
+    # make activites vector and bind it to xdata
+    activites <- makeDescriptiveActivities()
+    xdata <- bind_cols(activities, xdata)
+    write.table(xdata, file = paste0(outputDir, "./step3.txt"),
                 row.names = FALSE)
+    
+    #xdata <- makeDescriptiveColumnNames(xdata)
+    # append the subject and activity columns: steps 3 and 4
+    #xdata <- appendSubjectColumn(xdata)
+    #xdata <- relabelAndAppendActivites(xdata)
+    
+    #write.table(xdata, file = paste0(outputDir, "./step4.txt"),
+    #            row.names = FALSE)
 }
 
 ## Downloads the Human Activity Recognition data, unzips it, renames the
@@ -154,6 +160,34 @@ removeNonMeanNonStdDev <- function(xdata) {
     xdata <- xdata[,indicesOfInterest]
     
     return(xdata)
+}
+
+## Reads a test or train activities file, creates a vector with the same number
+## of records, fills that vector with the descriptive name of the activity, and
+## finally writes a file with of the descriptive activity names to the output
+## directory.
+##
+## testData - TRUE if activity file to be read is the y_test.txt file
+##            FALSE if activitye file to be read is the y_train.txt file
+makeDescriptiveActivities <- function() {
+    # combine the test and train activites: test on top
+    testActivities <- read.table(paste0(testDir, "/y_test.txt"))
+    trainActivities <- read.table(paste0(trainDir, "/y_train.txt"))
+    activities <- bind_rows(testActivities, trainActivities)
+    # add names to the combined df
+    activities <- mutate(activities, name = "")
+    names(activities) <- c("code", "name")
+    # create a df for the activity labels and add column labels
+    actLabels <- read.table(paste0(dataDir, "/activity_labels.txt"),
+                            sep = " ", stringsAsFactors = FALSE)
+    names(actLabels) <- c("code", "name")
+    # populate the activity descriptions
+    for(i in seq_along(activities$code)) {
+        code <- activities$code[i]
+        activities$name[i] <- actLabels[code, "name"]
+    }
+    
+    return(activities)
 }
 
 makeDescriptiveColumnNames <- function(xdata) {
