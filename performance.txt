@@ -1,0 +1,13 @@
+7/23/2015 
+> run_analysis("fromScratch")  # about 8.5 minutes
+10:07:38 HAR data download started...
+trying URL 'https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip'
+Content type 'application/zip' length 62556944 bytes (59.7 MB)
+downloaded 59.7 MB
+
+10:07:51 HAR data download complete...
+10:10:22  Finished reading X_test.txt data file into dataframe.
+10:15:32  Finished reading X_train.txt data file into dataframe.
+10:15:39  Finished dput of xtestdf.R.
+10:15:53  Finished dput of xtestdf.R.
+10:15:53 Deparsed HAR X data file creations complete...
