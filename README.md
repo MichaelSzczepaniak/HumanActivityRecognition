@@ -39,7 +39,11 @@ The code book for this project is provided in the [**CodeBook.md** file](https:/
 
 
 ## Data
-The raw data for this project was obtained from this **UCI Machine Learning Repository:**
+The raw data for this project was obtained from here:
+
+[https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip](https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip)
+
+which has been adapted from the original source on the **UCI Machine Learning Repository** at:
 
 [http://archive.ics.uci.edu/ml/datasets/Human+Activity+Recognition+Using+Smartphones](http://archive.ics.uci.edu/ml/datasets/Human+Activity+Recognition+Using+Smartphones)
 
