@@ -1,4 +1,5 @@
 7/23/2015 
+
 > run_analysis("fromScratch")  # about 8.5 minutes
 10:07:38 HAR data download started...
 trying URL 'https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip'
@@ -29,3 +30,44 @@ downloaded 59.7 MB
 17:34:57 Deparsed HAR X data file creations complete. Start reading...
 17:35:18 reading deparsed HAR dataframes complete...
 17:35:31 addOriginalFeaturesAsHeaders completed.
+
+7/24/2015
+
+> run_analysis("fromScratch")  # still about 8.5 minutes
+10:27:09 HAR data download started...
+trying URL 'https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip'
+Content type 'application/zip' length 62556944 bytes (59.7 MB)
+downloaded 59.7 MB
+
+10:27:21 HAR data download complete...
+10:27:21  Start reading X_test.txt data file into dataframe.
+10:29:45  Finished reading X_test.txt data file into dataframe.
+10:29:45  Start reading X_train.txt data file into dataframe.
+10:34:41  Finished reading X_train.txt data file into dataframe.
+          Start dput of test data...
+10:34:48  Finished dput of xtestdf.R. Start dput of train data.
+10:35:02  Finished dput of xtraindf.R.
+10:35:02 Deparsed HAR X data file creations complete. Start reading...
+10:35:23 reading deparsed HAR dataframes complete...
+10:35:37 addOriginalFeaturesAsHeaders completed.
+
+> run_analysis("fromScratch")  # still about 8.5 minutes
+10:55:52 HAR data download started...
+trying URL 'https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip'
+Content type 'application/zip' length 62556944 bytes (59.7 MB)
+downloaded 59.7 MB
+
+10:56:09 HAR data download complete...
+10:56:09  Start reading X_test.txt data file into dataframe.
+10:58:16  Finished reading X_test.txt data file into dataframe.
+10:58:16  Start reading X_train.txt data file into dataframe.
+11:03:15  Finished reading X_train.txt data file into dataframe.
+          Start dput of test data...
+11:03:21  Finished dput of xtestdf.R. Start dput of train data.
+11:03:35  Finished dput of xtraindf.R.
+11:03:35 Deparsed HAR X data file creations complete. Start reading...
+11:03:57 reading deparsed HAR dataframes complete...
+11:04:10 addOriginalFeaturesAsHeaders completed.
+11:04:12 Removal of unneeded columns: step 2. complete.
+11:04:14 Append descriptive activites: step 3. complete.
+11:04:15 Append subject and make descriptive col names: step 4. complete.

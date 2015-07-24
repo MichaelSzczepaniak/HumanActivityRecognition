@@ -38,20 +38,31 @@ run_analysis <- function(options = "fromDeparsedData") {
                 row.names = FALSE)
     rm(list = c("xtestdata", "xtraindata"))
     xdata <- addOriginalFeaturesAsHeaders(xdata)
+    cat(format(Sys.time(), "%T"), "addOriginalFeaturesAsHeaders completed.\n")
     xdata <- removeNonMeanNonStdDev(xdata)  # step 2.
     write.table(xdata, file = paste0(outputDir, "./step2.txt"),
                 row.names = FALSE)
+    cat(format(Sys.time(), "%T"),
+        "Removal of unneeded columns: step 2. complete.\n")
     # make activites vector and bind it to xdata: step 3
     activities <- makeDescriptiveActivities()
     xdata <- bind_cols(activities["activity"], xdata)
     write.table(xdata, file = paste0(outputDir, "./step3.txt"),
                 row.names = FALSE)
+    cat(format(Sys.time(), "%T"),
+        "Append descriptive activites: step 3. complete.\n")
     # make variables names more descriptive: step 4
     xdata <- makeDescriptiveColumnNames(xdata)
     # append the subject column
     xdata <- appendSubjectColumn(xdata)
     write.table(xdata, file = paste0(outputDir, "./step4.txt"),
                 row.names = FALSE)
+    cat(format(Sys.time(), "%T"),
+        "Append subject and make descriptive col names: step 4. complete.\n")
+    
+    
+    cat(format(Sys.time(), "%T"),
+        "Summarize variable by subject & activity: step 5. complete.\n")
 }
 
 readingDeparsedDataMessage <- function(){
@@ -153,7 +164,6 @@ addOriginalFeaturesAsHeaders <- function(xdata) {
     originalColumnNames <<- read.table(featuresPath, sep = " ",
                                        stringsAsFactors = FALSE)[[2]]
     names(xdata) <- originalColumnNames
-    cat(format(Sys.time(), "%T"), "addOriginalFeaturesAsHeaders completed.\n")
     
     return(xdata)
 }
