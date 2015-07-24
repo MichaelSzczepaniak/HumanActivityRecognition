@@ -71,3 +71,21 @@ downloaded 59.7 MB
 11:04:12 Removal of unneeded columns: step 2. complete.
 11:04:14 Append descriptive activites: step 3. complete.
 11:04:15 Append subject and make descriptive col names: step 4. complete.
+
+*** New default is options = "fromLocalZip" which only skips the downloading of the zip file ***
+
+> run_analysis()  # still about 8.5 minutes
+17:08:49  Start reading X_test.txt data file into dataframe.
+17:11:01  Finished reading X_test.txt data file into dataframe.
+17:11:01  Start reading X_train.txt data file into dataframe.
+17:16:07  Finished reading X_train.txt data file into dataframe.
+          Start dput of test data...
+17:16:22  Finished dput of xtestdf.R. Start dput of train data.
+17:16:36  Finished dput of xtraindf.R.
+17:16:36 Deparsed HAR X data file creations complete. Start reading...
+17:16:59 reading deparsed HAR dataframes complete...
+17:17:13 addOriginalFeaturesAsHeaders completed.
+17:17:14 Removal of unneeded columns: step 2. complete.
+17:17:16 Append descriptive activities: step 3. complete.
+17:17:18 Append subject and make descriptive col names: step 4. complete.
+17:17:18 Summarize variable by subject & activity: step 5. complete.

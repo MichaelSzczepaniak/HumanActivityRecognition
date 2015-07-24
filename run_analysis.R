@@ -1,27 +1,110 @@
 library(dplyr)
 library(downloader)
 
+## Michael Szczepaniak - July 2015
+##
+## This function has one parameter:
+##
+## options - This tells the function how to obtain the data for the analysis.
+##           The three allowed values are: "fromLocalZip", "fromScratch" or
+##           "fromDeparsed".  These options can be described as follows:
+##
+##           "fromLocalZip" (default) - This directs the function to look for a
+##                                      zip data file name "data.zip"
+##                                      in the same directory from which this 
+##                                      script is being run.
+##           "fromDeparsed" - This directs the function to look for two deparsed
+##                            dataframe object files that were constructed from
+##                            the x_test.txt and x_train.txt files.  To run this
+##                            option successfully, the function must be run
+##                            using either the "fromLocalZip" or "fromScratch"
+##                            options at least once before in order for the
+##                            deparsed object files to be built.
+##            "fromScratch" - This directs the function to download the zip
+##                            file from the internet before proceeding with the
+##                            analysis.  This option took just under 9 minutes
+##                            on my i7 laptop with 16Gb of RAM, but should be
+##                            used if the two other options fail to work.
+##
+## Here is a description of the exection steps taken by the function:
+##
+## 1) If option = "fromScratch", the HAR zip file is downloaded from:
+##    https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip
+##    If options = "fromLocalZip" (default) or "fromDeparsed", this step is
+##    skipped.
+## 2) If options = "fromLocalZip" (default), the data.zip file
+##    is read from the directory which this script is being run from, the zip
+##    file is exploded into a directory names "UCI HAR Dataset". An error
+##    will result if zip file with this name could not be found or if the zip
+##    file explosion creates a directory named something other than
+##    "UCI HAR Dataset".
+## 3) The test and train feature data is then read into 2 data frames (dfs).
+## 4) The test and train dfs are deparsed and written to the files:
+##    UCI HAR Dataset/outputs/xtestdf.R and UCI HAR Dataset/outputs/xtraindf.R
+##    respectively.  NOTE: This was done so that successive runs using:
+##    options = "fromDeparsed" could bypass steps 1) through 3) to speed
+##    successive executions.
+## 5) The deparsed dfs created in step 3) are read into two dfs in memory:
+## 6) The xtestdata and xtraindata dfs are combined into a single dataframe
+##    called xdata.  This completed step 1. of the analysis as described in the
+##    README.md file.
+## 7) The feature.txt file is read and the feature names were set as the
+##    column names for xdata.
+## 8) The xdata df was subsetted to include only features that had "mean()" or
+##    "std()" in their column names.  This completed step 2. of the analysis as
+##    described in the README.md file.
+## 9) The activities files (y_test.txt and y_train.txt) were read, a vector was
+##    was built with the values from these files, the values in the vector were
+##    replaced by the names of the activities defines in the
+##    activities_labels.txt file, and then the updated vector was column bound
+##    to the xdata df.  This completed step 3. of the analysis as described in
+##    the README.md file.
+##10) The column names of the features were revised to be more readable and
+##    descriptive.  This completed step 4. of the analysis as described in the
+##    README.md file.
+##11) The xdata resulting from 10) was grouped by activity and subject and
+##    summarized by applying the mean to each group of variable.
+##12) The summarize table from 11) was then written a file called:
+##    HARByActivityAndSubject.txt
+##    using the command:
+##
+##    write.table(summarizedByActivityAndSubject,
+##                file = "./output/HARByActivityAndSubject.txt"),
+##                row.names = FALSE)
+##
+## If options is set to "fromDeparsed", this function needs to have been
+## executed at least one time prior using options = "fromScratch" in order to
+## build the deparsed xtestdf.R and xtraindf.R object files which the function
+## reads in as described in step 4)
 ## 
-## 
-run_analysis <- function(options = "fromDeparsedData") {
+run_analysis <- function(options = "fromLocalZip") {
     xtestdata <- NULL
     xtraindata <- NULL
+    datafile <- "data.zip"
     loadDirectoryStructure()
     if(options == "fromScratch"){
-        cat(format(Sys.time(), "%T"),
-            "HAR data download started...\n")
-        getHARData()  # gets the zipped data file, explodes it, and renames dir
+        cat(format(Sys.time(), "%T"), "HAR data download started...\n")
+        getHARData(datafile)
         cat(format(Sys.time(), "%T"), "HAR data download complete...\n")
+        unzip(datafile)
         createRawDeparsedXData()  # creates the output directory then
         # constructs the xtestdf.R and xtraindf.R
         # deparsed dataframes and store them there
         cat(format(Sys.time(), "%T"),
             "Deparsed HAR X data file creations complete. Start reading...\n")
-    } else if(options == "fromDeparsedData") {
-        readingDeparsedDataMessage()
+    } else if(options == "fromLocalZip") {
+        unzip(datafile)
+        createRawDeparsedXData()  # creates the output directory then
+        # constructs the xtestdf.R and xtraindf.R
+        # deparsed dataframes and store them there
+        cat(format(Sys.time(), "%T"),
+            "Deparsed HAR X data file creations complete. Start reading...\n")
+    } else if(options == "fromDeparsed") {
+        cat(format(Sys.time(), "%T"),
+            "reading deparsed HAR dataframes started...\n")
     } else {
         cat("Invalid option. Valid options are:\n")
-        cat("fromScratch or fromDeparsedData\n")
+        cat("fromScratch or fromDeparsed\n")
         cat("See README.md for details.\n")
         cat("No computation done. Exiting.")
     }
@@ -44,13 +127,13 @@ run_analysis <- function(options = "fromDeparsedData") {
                 row.names = FALSE)
     cat(format(Sys.time(), "%T"),
         "Removal of unneeded columns: step 2. complete.\n")
-    # make activites vector and bind it to xdata: step 3
+    # make activities vector and bind it to xdata: step 3
     activities <- makeDescriptiveActivities()
     xdata <- bind_cols(activities["activity"], xdata)
     write.table(xdata, file = paste0(outputDir, "./step3.txt"),
                 row.names = FALSE)
     cat(format(Sys.time(), "%T"),
-        "Append descriptive activites: step 3. complete.\n")
+        "Append descriptive activities: step 3. complete.\n")
     # make variables names more descriptive: step 4
     xdata <- makeDescriptiveColumnNames(xdata)
     # append the subject column
@@ -63,31 +146,30 @@ run_analysis <- function(options = "fromDeparsedData") {
     xByActivityAndSubject <- group_by(xdata, activity, subject)
     summarizedByActivityAndSubject <- summarise_each(xByActivityAndSubject,
                                                      funs(mean))
+    revisedSummaryHeaders <-
+        getRevisedSummaryHeaders(summarizedByActivityAndSubject)
+    
+    names(summarizedByActivityAndSubject) <- revisedSummaryHeaders
+    
     write.table(summarizedByActivityAndSubject,
                 file = paste0(outputDir, "./HARByActivityAndSubject.txt"),
                 row.names = FALSE)
     cat(format(Sys.time(), "%T"),
         "Summarize variable by subject & activity: step 5. complete.\n")
     
-    return(summarizedByActivityAndSubject)
-}
-
-readingDeparsedDataMessage <- function(){
-    cat(format(Sys.time(), "%T"),
-        "reading deparsed HAR dataframes started...\n")
+    #return(summarizedByActivityAndSubject)
 }
 
 ## Downloads the Human Activity Recognition data, unzips it, renames the
 ## directory to 'data', and loads directory reference data to the workspace
-getHARData <- function (datafile = "data.zip") {
+getHARData <- function (datafile) {
     fileUrl <- "https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip"
     download(fileUrl, destfile=paste0("./", datafile))
-    unzip(datafile)
     # The next line creates concurrency issues
     #file.rename("UCI HAR Dataset", "data")
     #cat(format(Sys.time(), "%T"),
     #    "'UCI HAR Dataset' dir renamed to 'data'...\n")
-    file.remove(datafile)
+    #file.remove(datafile)
 }
 
 ## Simply loads some variables that define the directory structure of the
@@ -163,6 +245,8 @@ readDeparsedXData <- function(testData) {
     return(xdata)
 }
 
+## Reads the features.txt file and adds these feature names as the headers
+## (column names) for the columns in the data frame
 addOriginalFeaturesAsHeaders <- function(xdata) {
     # read in the features.txt which contains the columns variable names
     featuresPath <- paste0(dataDir, "/features.txt")
@@ -175,6 +259,8 @@ addOriginalFeaturesAsHeaders <- function(xdata) {
     return(xdata)
 }
 
+## Subsets out only columns that have "mean()" or "std()" in their column name
+## and returns the trimmed down data frame
 removeNonMeanNonStdDev <- function(xdata) {
     meanIndices <- grep("mean\\(\\)", originalColumnNames)
     stdIndices <- grep("std\\(\\)", originalColumnNames)
@@ -211,6 +297,10 @@ makeDescriptiveActivities <- function() {
     return(activities)
 }
 
+## Makes the column names more explicit and/or more readable. Replaces leading
+## 't', and 'f' characters by 'time' and 'frequency' respectively. Replaces
+## '-mean()-' and '-mean()' by 'Mean', and '-std()-' and '-std()' by 
+## 'StdDeviation'
 makeDescriptiveColumnNames <- function(xdata) {
     originalColumnNames <- names(xdata)
     revisedNames <- gsub("tBody", "timeBody", originalColumnNames)
@@ -223,6 +313,15 @@ makeDescriptiveColumnNames <- function(xdata) {
     names(xdata) <- revisedNames
     
     return(xdata)
+}
+
+getRevisedSummaryHeaders <- function(xdata) {
+    originalColumnNames <- names(xdata)
+    revisedNames <- gsub("timeBody", "MeanOfTimeBody", originalColumnNames)
+    revisedNames <- gsub("frequencyBody", "MeanOfFrequencyBody", revisedNames)
+    revisedNames <- gsub("timeGravity", "MeanOfTimeGravity", revisedNames)
+    
+    return(revisedNames)
 }
 
 ##
