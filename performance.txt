@@ -11,3 +11,21 @@ downloaded 59.7 MB
 10:15:39  Finished dput of xtestdf.R.
 10:15:53  Finished dput of xtestdf.R.
 10:15:53 Deparsed HAR X data file creations complete...
+
+> run_analysis("fromScratch")  # still about 8.5 minutes
+17:26:55 HAR data download started...
+trying URL 'https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip'
+Content type 'application/zip' length 62556944 bytes (59.7 MB)
+downloaded 59.7 MB
+
+17:27:16 HAR data download complete...
+17:27:16  Start reading X_test.txt data file into dataframe.
+17:29:28  Finished reading X_test.txt data file into dataframe.
+17:29:28  Start reading X_train.txt data file into dataframe.
+17:34:34  Finished reading X_train.txt data file into dataframe.
+          Start dput of test data...
+17:34:44  Finished dput of xtestdf.R. Start dput of train data.
+17:34:57  Finished dput of xtraindf.R.
+17:34:57 Deparsed HAR X data file creations complete. Start reading...
+17:35:18 reading deparsed HAR dataframes complete...
+17:35:31 addOriginalFeaturesAsHeaders completed.

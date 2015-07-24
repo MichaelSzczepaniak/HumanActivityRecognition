@@ -6,6 +6,7 @@ library(downloader)
 run_analysis <- function(options = "fromDeparsedData") {
     xtestdata <- NULL
     xtraindata <- NULL
+    loadDirectoryStructure()
     if(options == "fromScratch"){
         cat(format(Sys.time(), "%T"),
             "HAR data download started...\n")
@@ -15,20 +16,21 @@ run_analysis <- function(options = "fromDeparsedData") {
                                   # constructs the xtestdf.R and xtraindf.R
                                   # deparsed dataframes and store them there
         cat(format(Sys.time(), "%T"),
-            "Deparsed HAR X data file creations complete...\n")
+            "Deparsed HAR X data file creations complete. Start reading...\n")
     } else if(options == "fromDeparsedData") {
-        cat(format(Sys.time(), "%T"),
-            "reading deparsed HAR dataframes started...\n")
-        xtestdata <- readDeparsedXData(TRUE)
-        xtraindata <- readDeparsedXData(FALSE)
-        cat(format(Sys.time(), "%T"),
-            "reading deparsed HAR dataframes complete...\n")
+        readingDeparsedDataMessage()
     } else {
         cat("Invalid option. Valid options are:\n")
         cat("fromScratch or fromDeparsedData\n")
         cat("See README.md for details.\n")
         cat("No computation done. Exiting.")
     }
+    # get the x data from the deparsed objects
+    xtestdata <- readDeparsedXData(TRUE)
+    xtraindata <- readDeparsedXData(FALSE)
+    cat(format(Sys.time(), "%T"),
+        "reading deparsed HAR dataframes complete...\n")
+    
     # combine the test and train dataframes, keep the combined and remove
     # what is not longer needed
     xdata <- bind_rows(xtestdata, xtraindata)  # step 1.
@@ -39,19 +41,22 @@ run_analysis <- function(options = "fromDeparsedData") {
     xdata <- removeNonMeanNonStdDev(xdata)  # step 2.
     write.table(xdata, file = paste0(outputDir, "./step2.txt"),
                 row.names = FALSE)
-    # make activites vector and bind it to xdata
-    activites <- makeDescriptiveActivities()
-    xdata <- bind_cols(activities, xdata)
+    # make activites vector and bind it to xdata: step 3
+    activities <- makeDescriptiveActivities()
+    xdata <- bind_cols(activities["activity"], xdata)
     write.table(xdata, file = paste0(outputDir, "./step3.txt"),
                 row.names = FALSE)
-    
-    #xdata <- makeDescriptiveColumnNames(xdata)
-    # append the subject and activity columns: steps 3 and 4
-    #xdata <- appendSubjectColumn(xdata)
-    #xdata <- relabelAndAppendActivites(xdata)
-    
-    #write.table(xdata, file = paste0(outputDir, "./step4.txt"),
-    #            row.names = FALSE)
+    # make variables names more descriptive: step 4
+    xdata <- makeDescriptiveColumnNames(xdata)
+    # append the subject column
+    xdata <- appendSubjectColumn(xdata)
+    write.table(xdata, file = paste0(outputDir, "./step4.txt"),
+                row.names = FALSE)
+}
+
+readingDeparsedDataMessage <- function(){
+    cat(format(Sys.time(), "%T"),
+        "reading deparsed HAR dataframes started...\n")
 }
 
 ## Downloads the Human Activity Recognition data, unzips it, renames the
@@ -64,7 +69,6 @@ getHARData <- function (datafile = "data.zip") {
     #file.rename("UCI HAR Dataset", "data")
     #cat(format(Sys.time(), "%T"),
     #    "'UCI HAR Dataset' dir renamed to 'data'...\n")
-    loadDirectoryStructure()
     file.remove(datafile)
 }
 
@@ -93,14 +97,14 @@ createRawDeparsedXData <- function() {
         " Start reading X_train.txt data file into dataframe.\n")
     xtraindata <- readXFromRawData(FALSE)
     cat(format(Sys.time(), "%T"),
-        " Finished reading X_train.txt data file into dataframe. ",
-        " Start dput of test data.\n")
+        " Finished reading X_train.txt data file into dataframe.\n",
+        "         Start dput of test data...\n")
     dput(xtestdata, file = paste0(outputDir, "/xtestdf.R"))
     cat(format(Sys.time(), "%T"),
         " Finished dput of xtestdf.R. Start dput of train data.\n")
     dput(xtraindata, file = paste0(outputDir, "/xtraindf.R"))
     cat(format(Sys.time(), "%T"),
-        " Finished dput of xtestdf.R.\n")
+        " Finished dput of xtraindf.R.\n")
 }
 
 ## Reads the data from a raw HAR data file and returns a dataframe.
@@ -149,6 +153,7 @@ addOriginalFeaturesAsHeaders <- function(xdata) {
     originalColumnNames <<- read.table(featuresPath, sep = " ",
                                        stringsAsFactors = FALSE)[[2]]
     names(xdata) <- originalColumnNames
+    cat(format(Sys.time(), "%T"), "addOriginalFeaturesAsHeaders completed.\n")
     
     return(xdata)
 }
@@ -164,8 +169,7 @@ removeNonMeanNonStdDev <- function(xdata) {
 
 ## Reads a test or train activities file, creates a vector with the same number
 ## of records, fills that vector with the descriptive name of the activity, and
-## finally writes a file with of the descriptive activity names to the output
-## directory.
+## returns the vector created.
 ##
 ## testData - TRUE if activity file to be read is the y_test.txt file
 ##            FALSE if activitye file to be read is the y_train.txt file
@@ -175,37 +179,43 @@ makeDescriptiveActivities <- function() {
     trainActivities <- read.table(paste0(trainDir, "/y_train.txt"))
     activities <- bind_rows(testActivities, trainActivities)
     # add names to the combined df
-    activities <- mutate(activities, name = "")
-    names(activities) <- c("code", "name")
+    activities <- mutate(activities, activity = "")
+    names(activities) <- c("code", "activity")
     # create a df for the activity labels and add column labels
     actLabels <- read.table(paste0(dataDir, "/activity_labels.txt"),
                             sep = " ", stringsAsFactors = FALSE)
-    names(actLabels) <- c("code", "name")
+    names(actLabels) <- c("code", "activity")
     # populate the activity descriptions
     for(i in seq_along(activities$code)) {
         code <- activities$code[i]
-        activities$name[i] <- actLabels[code, "name"]
+        activities$activity[i] <- actLabels[code, "activity"]
     }
     
     return(activities)
 }
 
 makeDescriptiveColumnNames <- function(xdata) {
-    #originalColumnNames
+    originalColumnNames <- names(xdata)
+    revisedNames <- gsub("tBody", "timeBody", originalColumnNames)
+    revisedNames <- gsub("fBody", "frequencyBody", revisedNames)
+    revisedNames <- gsub("tGravity", "timeGravity", revisedNames)
+    revisedNames <- gsub("-mean\\(\\)-", "Mean", revisedNames)
+    revisedNames <- gsub("-mean\\(\\)", "Mean", revisedNames)
+    revisedNames <- gsub("-std\\(\\)-", "StdDeviation", revisedNames)
+    revisedNames <- gsub("-std\\(\\)", "StdDeviation", revisedNames)
+    names(xdata) <- revisedNames
     
     return(xdata)
 }
 
 ##
 appendSubjectColumn <- function(xdata) {
-    
-    
-    return(xdata)
-}
-
-## 
-relabelAndAppendActivites <- function(xdata) {
-    
+    # combine the test and train subjects: test on top
+    testSubjects <- read.table(paste0(testDir, "/subject_test.txt"))
+    trainSubjects <- read.table(paste0(trainDir, "/subject_train.txt"))
+    subjects <- bind_rows(testSubjects, trainSubjects)
+    names(subjects) <- c("subject")
+    xdata <- bind_cols(subjects[1], xdata)
     
     return(xdata)
 }

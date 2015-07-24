@@ -19,7 +19,10 @@ This code book describes the files and variables used in this analysis.  Files a
      <code>read.fwf(file = "./UCI HAR Dataset/train/X_train.txt", rep(c(-1, 15), 561))</code>  
      from the main project directory
 
-## Processing
+## Raw Data
+
+
+## Processed Data
 
 1. Data Files:  The main function that performs the analysis (**run_analysis.R**) reads the following x data files (in order of size):
 
