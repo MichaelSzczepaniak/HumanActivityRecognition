@@ -13,8 +13,8 @@ run_analysis <- function(options = "fromDeparsedData") {
         getHARData()  # gets the zipped data file, explodes it, and renames dir
         cat(format(Sys.time(), "%T"), "HAR data download complete...\n")
         createRawDeparsedXData()  # creates the output directory then
-                                  # constructs the xtestdf.R and xtraindf.R
-                                  # deparsed dataframes and store them there
+        # constructs the xtestdf.R and xtraindf.R
+        # deparsed dataframes and store them there
         cat(format(Sys.time(), "%T"),
             "Deparsed HAR X data file creations complete. Start reading...\n")
     } else if(options == "fromDeparsedData") {
@@ -59,10 +59,17 @@ run_analysis <- function(options = "fromDeparsedData") {
                 row.names = FALSE)
     cat(format(Sys.time(), "%T"),
         "Append subject and make descriptive col names: step 4. complete.\n")
-    
-    
+    # summarize x data by activity and subject then write table: step 5
+    xByActivityAndSubject <- group_by(xdata, activity, subject)
+    summarizedByActivityAndSubject <- summarise_each(xByActivityAndSubject,
+                                                     funs(mean))
+    write.table(summarizedByActivityAndSubject,
+                file = paste0(outputDir, "./HARByActivityAndSubject.txt"),
+                row.names = FALSE)
     cat(format(Sys.time(), "%T"),
         "Summarize variable by subject & activity: step 5. complete.\n")
+    
+    return(summarizedByActivityAndSubject)
 }
 
 readingDeparsedDataMessage <- function(){
@@ -103,7 +110,7 @@ createRawDeparsedXData <- function() {
         " Start reading X_test.txt data file into dataframe.\n")
     xtestdata <- readXFromRawData(TRUE)
     cat(format(Sys.time(), "%T"),
-               " Finished reading X_test.txt data file into dataframe.\n")
+        " Finished reading X_test.txt data file into dataframe.\n")
     cat(format(Sys.time(), "%T"),
         " Start reading X_train.txt data file into dataframe.\n")
     xtraindata <- readXFromRawData(FALSE)
