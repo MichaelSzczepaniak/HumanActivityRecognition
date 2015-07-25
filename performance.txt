@@ -89,3 +89,59 @@ downloaded 59.7 MB
 17:17:16 Append descriptive activities: step 3. complete.
 17:17:18 Append subject and make descriptive col names: step 4. complete.
 17:17:18 Summarize variable by subject & activity: step 5. complete.
+
+7/26/2015
+
+> run_analysis()  # still about 8.5 minutes
+11:39:44  Start reading X_test.txt data file into dataframe.
+11:41:59  Finished reading X_test.txt data file into dataframe.
+11:41:59  Start reading X_train.txt data file into dataframe.
+11:47:13  Finished reading X_train.txt data file into dataframe.
+          Start dput of test data...
+11:47:20  Finished dput of xtestdf.R. Start dput of train data.
+11:47:35  Finished dput of xtraindf.R.
+11:47:35 Deparsed HAR X data file creations complete. Start reading...
+11:47:56 reading deparsed HAR dataframes complete...
+11:48:09 addOriginalFeaturesAsHeaders completed.
+11:48:11 Removal of unneeded columns: step 2. complete.
+11:48:15 Append descriptive activities: step 3. complete.
+11:48:16 Append subject and make descriptive col names: step 4. complete.
+11:48:16 Summarize variable by subject & activity: step 5. complete.
+
+> run_analysis()    # about 8.5 minutes when not doing download
+11:58:45  Start reading X_test.txt data file into dataframe.
+12:00:58  Finished reading X_test.txt data file into dataframe.
+12:00:58  Start reading X_train.txt data file into dataframe.
+12:06:14  Finished reading X_train.txt data file into dataframe.
+          Start dput of test data...
+12:06:19  Finished dput of xtestdf.R. Start dput of train data.
+12:06:33  Finished dput of xtraindf.R.
+12:06:33 Deparsed HAR X data file creations complete. Start reading...
+12:06:57 reading deparsed HAR dataframes complete...
+12:07:10 addOriginalFeaturesAsHeaders completed.
+12:07:11 Removal of unneeded columns: step 2. complete.
+12:07:14 Append descriptive activities: step 3. complete.
+12:07:15 Append subject and make descriptive col names: step 4. complete.
+12:07:15 Summarize variable by subject & activity: step 5. complete.
+
+> run_analysis("fromScratch")  # almost 9 minutes if the download is included
+12:19:18 HAR data download started...
+trying URL 'https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip'
+Content type 'application/zip' length 62556944 bytes (59.7 MB)
+downloaded 59.7 MB
+
+12:19:37 HAR data download complete...
+12:19:39  Start reading X_test.txt data file into dataframe.
+12:21:52  Finished reading X_test.txt data file into dataframe.
+12:21:52  Start reading X_train.txt data file into dataframe.
+12:27:05  Finished reading X_train.txt data file into dataframe.
+          Start dput of test data...
+12:27:11  Finished dput of xtestdf.R. Start dput of train data.
+12:27:27  Finished dput of xtraindf.R.
+12:27:27 Deparsed HAR X data file creations complete. Start reading...
+12:27:48 reading deparsed HAR dataframes complete...
+12:28:01 addOriginalFeaturesAsHeaders completed.
+12:28:03 Removal of unneeded columns: step 2. complete.
+12:28:05 Append descriptive activities: step 3. complete.
+12:28:07 Append subject and make descriptive col names: step 4. complete.
+12:28:07 Summarize variable by subject & activity: step 5. complete.

@@ -10,9 +10,9 @@ library(downloader)
 ##           "fromDeparsed".  These options can be described as follows:
 ##
 ##           "fromLocalZip" (default) - This directs the function to look for a
-##                                      zip data file name "data.zip"
-##                                      in the same directory from which this 
-##                                      script is being run.
+##                                      zip data file specified by the zipFile
+##                                      parameter in the same directory from  
+##                                      which this script is being run.
 ##           "fromDeparsed" - This directs the function to look for two deparsed
 ##                            dataframe object files that were constructed from
 ##                            the x_test.txt and x_train.txt files.  To run this
@@ -33,16 +33,14 @@ library(downloader)
 ##
 ## Here is a description of the exection steps taken by the function:
 ##
-## 1) If option = "fromScratch", the HAR zip file is downloaded from:
-##    https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip
-##    If options = "fromLocalZip" (default) or "fromDeparsed", this step is
-##    skipped.
-## 2) If options = "fromLocalZip" (default), the data.zip file
-##    is read from the directory which this script is being run from, the zip
-##    file is exploded into a directory names "UCI HAR Dataset". An error
-##    will result if zip file with this name could not be found or if the zip
-##    file explosion creates a directory named something other than
-##    "UCI HAR Dataset".
+## 1) If option = "fromScratch", the HAR zip file is downloaded using the
+##    default value for zipUrl as described above.
+##    If options = "fromLocalZip" (default) or "fromDeparsed", skip to step 2)
+## 2) If options = "fromLocalZip" (default), the file specified by zipFile is
+##    read from the directory which this script is being run from, and the zip
+##    file is exploded into a directory names "UCI HAR Dataset". An error will
+##    result if the zip file could not be found or if the zip file explosion
+##    creates a directory named something other than "UCI HAR Dataset".
 ## 3) The test and train feature data is then read into 2 data frames (dfs).
 ## 4) The test and train dfs are deparsed and written to the files:
 ##    UCI HAR Dataset/outputs/xtestdf.R and UCI HAR Dataset/outputs/xtraindf.R
@@ -70,8 +68,7 @@ library(downloader)
 ##11) The xdata resulting from 10) was grouped by activity and subject and
 ##    summarized by applying the mean to each group of variable.
 ##12) The summarize table from 11) was then written a file called:
-##    HARByActivityAndSubject.txt
-##    using the command:
+##    HARByActivityAndSubject.txt  using the command:
 ##
 ##    write.table(summarizedByActivityAndSubject,
 ##                file = "./output/HARByActivityAndSubject.txt"),
@@ -84,10 +81,11 @@ library(downloader)
 ## 
 run_analysis <- function(options = "fromLocalZip",
                          zipFile = "UCI HAR Dataset.zip",
+                         zipDir = "UCI HAR Dataset",
                          zipUrl = "https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip") {
     xtestdata <- NULL
     xtraindata <- NULL
-    loadDirectoryStructure()
+    loadDirectoryStructure(zipDir)
     if(options == "fromScratch"){
         cat(format(Sys.time(), "%T"), "HAR data download started...\n")
         getHARData(zipFile, zipUrl)
@@ -141,7 +139,8 @@ run_analysis <- function(options = "fromLocalZip",
     cat(format(Sys.time(), "%T"),
         "Append descriptive activities: step 3. complete.\n")
     # make variables names more descriptive: step 4
-    xdata <- makeDescriptiveColumnNames(xdata)
+    revisedNames <- makeDescriptiveColumnNames(xdata)
+    names(xdata) <- revisedNames
     # append the subject column
     xdata <- appendSubjectColumn(xdata)
     write.table(xdata, file = paste0(outputDir, "./step4.txt"),
@@ -162,8 +161,6 @@ run_analysis <- function(options = "fromLocalZip",
                 row.names = FALSE)
     cat(format(Sys.time(), "%T"),
         "Summarize variable by subject & activity: step 5. complete.\n")
-    
-    #return(summarizedByActivityAndSubject)
 }
 
 ## Downloads the Human Activity Recognition data and unzips it
@@ -179,8 +176,8 @@ getHARData <- function (zipFile, zipUrl) {
 ## Simply loads some variables that define the directory structure of the
 ## dataset into the workspace so that it can be retrieved later by other
 ## operations.
-loadDirectoryStructure <- function() {
-    dataDir <<-  "./UCI HAR Dataset"
+loadDirectoryStructure <- function(zipDir) {
+    dataDir <<-  paste0("./", zipDir)
     testDir <<- paste0(dataDir, "/test")
     trainDir <<- paste0(dataDir, "/train")
     outputDir <<- paste0(dataDir, "/output")
@@ -191,7 +188,7 @@ loadDirectoryStructure <- function() {
 ##                          ../data/output/xtraindf.R
 ## These objects are created to speed future reconstruction of these dataframes.
 createRawDeparsedXData <- function() {
-    dir.create(outputDir)
+    if(!file.exists(outputDir)) {dir.create(outputDir)}
     cat(format(Sys.time(), "%T"),
         " Start reading X_test.txt data file into dataframe.\n")
     xtestdata <- readXFromRawData(TRUE)
@@ -304,7 +301,8 @@ makeDescriptiveActivities <- function() {
 ## Makes the column names more explicit and/or more readable. Replaces leading
 ## 't', and 'f' characters by 'time' and 'frequency' respectively. Replaces
 ## '-mean()-' and '-mean()' by 'Mean', and '-std()-' and '-std()' by 
-## 'StdDeviation'
+## 'StdDeviation', replaces "Acc" with "Acceleration", replaces "Gyro" with
+## "Gyroscope", and replaces "Mag" with "Magnitude"
 makeDescriptiveColumnNames <- function(xdata) {
     originalColumnNames <- names(xdata)
     revisedNames <- gsub("tBody", "timeBody", originalColumnNames)
@@ -312,13 +310,17 @@ makeDescriptiveColumnNames <- function(xdata) {
     revisedNames <- gsub("tGravity", "timeGravity", revisedNames)
     revisedNames <- gsub("-mean\\(\\)-", "Mean", revisedNames)
     revisedNames <- gsub("-mean\\(\\)", "Mean", revisedNames)
-    revisedNames <- gsub("-std\\(\\)-", "StdDeviation", revisedNames)
-    revisedNames <- gsub("-std\\(\\)", "StdDeviation", revisedNames)
-    names(xdata) <- revisedNames
+    revisedNames <- gsub("-std\\(\\)-", "StandardDeviation", revisedNames)
+    revisedNames <- gsub("-std\\(\\)", "StandardDeviation", revisedNames)
+    revisedNames <- gsub("Acc", "Acceleration", revisedNames)
+    revisedNames <- gsub("Gyro", "Gyroscope", revisedNames)
+    revisedNames <- gsub("Mag", "Magnitude", revisedNames)
     
-    return(xdata)
+    return(revisedNames)
 }
 
+## Returns vector of column names where 'MeanOf' is prepended to the
+## measurement variables
 getRevisedSummaryHeaders <- function(xdata) {
     originalColumnNames <- names(xdata)
     revisedNames <- gsub("timeBody", "MeanOfTimeBody", originalColumnNames)
@@ -328,9 +330,9 @@ getRevisedSummaryHeaders <- function(xdata) {
     return(revisedNames)
 }
 
-##
+## Combine the test and train subject vectors: test on top, train on bottom
+## and returns xdata with the appended subject column
 appendSubjectColumn <- function(xdata) {
-    # combine the test and train subjects: test on top
     testSubjects <- read.table(paste0(testDir, "/subject_test.txt"))
     trainSubjects <- read.table(paste0(trainDir, "/subject_train.txt"))
     subjects <- bind_rows(testSubjects, trainSubjects)
