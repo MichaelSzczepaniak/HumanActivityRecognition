@@ -3,7 +3,7 @@ library(downloader)
 
 ## Michael Szczepaniak - July 2015
 ##
-## This function has one parameter:
+## This function takes three parameter:
 ##
 ## options - This tells the function how to obtain the data for the analysis.
 ##           The three allowed values are: "fromLocalZip", "fromScratch" or
@@ -25,6 +25,11 @@ library(downloader)
 ##                            analysis.  This option took just under 9 minutes
 ##                            on my i7 laptop with 16Gb of RAM, but should be
 ##                            used if the two other options fail to work.
+##  zipFile - This is the name of the zip file of the dataset used for the 
+##            analysis. Default value: "UCI HAR Dataset.zip"
+##  zipUrl - This is the url used to download the zip file for the dataset when
+##           options = "fromScratch".  The default value is:
+##  https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip
 ##
 ## Here is a description of the exection steps taken by the function:
 ##
@@ -77,23 +82,24 @@ library(downloader)
 ## build the deparsed xtestdf.R and xtraindf.R object files which the function
 ## reads in as described in step 4)
 ## 
-run_analysis <- function(options = "fromLocalZip") {
+run_analysis <- function(options = "fromLocalZip",
+                         zipFile = "UCI HAR Dataset.zip",
+                         zipUrl = "https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip") {
     xtestdata <- NULL
     xtraindata <- NULL
-    datafile <- "data.zip"
     loadDirectoryStructure()
     if(options == "fromScratch"){
         cat(format(Sys.time(), "%T"), "HAR data download started...\n")
-        getHARData(datafile)
+        getHARData(zipFile, zipUrl)
         cat(format(Sys.time(), "%T"), "HAR data download complete...\n")
-        unzip(datafile)
+        unzip(zipFile)
         createRawDeparsedXData()  # creates the output directory then
         # constructs the xtestdf.R and xtraindf.R
         # deparsed dataframes and store them there
         cat(format(Sys.time(), "%T"),
             "Deparsed HAR X data file creations complete. Start reading...\n")
     } else if(options == "fromLocalZip") {
-        unzip(datafile)
+        unzip(zipFile)
         createRawDeparsedXData()  # creates the output directory then
         # constructs the xtestdf.R and xtraindf.R
         # deparsed dataframes and store them there
@@ -160,11 +166,9 @@ run_analysis <- function(options = "fromLocalZip") {
     #return(summarizedByActivityAndSubject)
 }
 
-## Downloads the Human Activity Recognition data, unzips it, renames the
-## directory to 'data', and loads directory reference data to the workspace
-getHARData <- function (datafile) {
-    fileUrl <- "https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip"
-    download(fileUrl, destfile=paste0("./", datafile))
+## Downloads the Human Activity Recognition data and unzips it
+getHARData <- function (zipFile, zipUrl) {
+    download(zipUrl, destfile=paste0("./", zipFile))
     # The next line creates concurrency issues
     #file.rename("UCI HAR Dataset", "data")
     #cat(format(Sys.time(), "%T"),
