@@ -196,7 +196,7 @@ readXFromRawData <- function(testData) {
 }
 </pre>
 
-It is now read in like this:
+They are now read in like this:
 
 <pre>
 library(dplyr)
