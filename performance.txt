@@ -145,3 +145,14 @@ downloaded 59.7 MB
 12:28:05 Append descriptive activities: step 3. complete.
 12:28:07 Append subject and make descriptive col names: step 4. complete.
 12:28:07 Summarize variable by subject & activity: step 5. complete.
+
+7/26/2015
+
+> run_analysis("fromDeparsed")  # took less than 1 minute
+11:55:34 reading deparsed HAR dataframes started...
+11:55:56 reading deparsed HAR dataframes complete...
+11:56:11 addOriginalFeaturesAsHeaders completed.
+11:56:13 Removal of unneeded columns: step 2. complete.
+11:56:15 Append descriptive activities: step 3. complete.
+11:56:17 Append subject and make descriptive col names: step 4. complete.
+11:56:17 Summarize variable by subject & activity: step 5. complete.

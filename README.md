@@ -3,14 +3,19 @@
 ## Contents  
 - [Description](#id-description)  
 - [Running the Analysis](#id-running-the-analysis)  
+  - [Simple way to run the analysis script](#id-simple)
+  - [Other ways to run the analysis script](#id-other)
+  - [Performance](#id-perf)
 - [Code Book](#id-codebook)  
 - [Raw and Processed Data](#id-data)
+  - [Raw data](#id-raw)
+  - [Processed data](#id-processed)
 - [The Tidy Data Set](#id-tidy)
 - [References](#id-refs)
 
 <div id='id-description'/>
 ## Description
-The purpose of this project is to demonstrate the "_ability to collect, work with, and clean a data set_".  The specific objective, as described in the requirements for the [**Getting and Cleaning Data** course](https://class.coursera.org/getdata-030) project offered by Johns Hopkins through [**Coursera**](https://www.coursera.org/) is to produce "_**tidy data**_" (Wickam 2014) \[[1](#id-refs)\] from data collected on human activity recognition, by executing the following steps:
+The purpose of this project is to demonstrate the "_ability to collect, work with, and clean a data set_".  The specific objective, as described in the requirements for the [**Getting and Cleaning Data** course](https://class.coursera.org/getdata-030) project offered by Johns Hopkins through [**Coursera**](https://www.coursera.org/) is to produce "_**tidy data**_" (Wickham 2014) \[[1](#id-refs)\] from data collected on human activity recognition, by executing the following steps:
 
 1. Merging the training and test sets to create one data set.
   - Reading the **X_test.txt** and **X_train.txt** files into their own dataframes and then putting them together.
@@ -49,7 +54,8 @@ The project consists of
 
 <div id='id-running-the-analysis'/>
 ## Running the Analysis
-### Simple way to run the script
+<div id='id-simple'/>
+### Simple way to run the analysis script
 The simplest way to run the analysis is to follow these steps:  
 
 1. Download the **run_analysis.R** script from this project to a directory which you will use as you workspace.
@@ -62,10 +68,9 @@ The simplest way to run the analysis is to follow these steps:
 
 The script will explode the zip file, read in the raw data files described in the **Raw Data** subsection of [**Raw and Processed Data**](#id-data) section and generate the files described in the **Processed Data** subsection of [**Raw and Processed Data**](#id-data) section which includes the tidy summarized output data set.  
 
-**IMPORTANT NOTE: This mode of operation took about 8.5 minutes to run on my i7 laptop with 16 Gb of RAM, so be patient.**
-
-### Other ways to run the script
-The script has 4 parameters which can be set to run the script in different modes.  The comments for the **run_analysis()** function are provided below along with signature of the function.
+<div id='id-other'/>
+### Other ways to run the analysis script
+The script has 4 parameters which can be set to run the script in different modes.  The comments for the **run_analysis()** function are provided below along with the signature of the function.
 
 <pre>
 ## This function takes four parameters:
@@ -152,11 +157,18 @@ run_analysis <- function(options = "fromLocalZip",
                          zipUrl = "https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip") {
 </pre>
 
+<div id='id-perf'/>
+### Performance
+Running **run\_analysis()** using all the default settings for the parameters took about 8.5 to 9 minutes.  Data for several runs were collected and stored in the [**performance.txt**](https://github.com/MichaelSzczepaniak/HumanActivityRecognition/blob/master/performance.txt) in the root directory of this project.  These runs were done on my i7 laptop with 16 Gb of RAM running 64 bit Window 7 Pro.
+
 The fastest mode of operation is to run the script using the _fromDeparsed_ options **if the script as been run as least one time before and has generated the deparsed training and testing objects**.  If the <code>./UCI HAR Dataset/output/xtestdf.R</code> and <code>./UCI HAR Dataset/output/xtraindf.R</code> files have been built, then one could run:  
 
 <code>run_analysis(options = "fromDeparsed")</code>  
 
-to generate the output **much faster than the default mode**.
+to generate the output **which took less than 1 minute to run on my system.**.
+
+#### Improving performance
+In keeping with the spirit of avoiding the trap of "premature optimization is the root of all evil" (Knuth 1974) \[[3](#id-refs)\], attempting to improve the performance wasn't attempted until late in the project.
 
 <div id='id-codebook'/>
 ## Code Book
@@ -168,6 +180,7 @@ The code book for this project is provided in the [**CodeBook.md** file](https:/
 
 <div id='id-data'/>
 ## Raw and Processed Data
+<div id='id-raw'/>
 ### Raw Data
 The raw data for this project was obtained from here:
 
@@ -201,6 +214,7 @@ and is located in the [**UCI HAR Dataset**](https://github.com/MichaelSzczepania
     - 2947 records, single field
     - ~8 Kb
 
+<div id='id-processed'/>
 ### Processed Data
 The processed data for this project is the data outputted by the **run_analysis()** function and resides in  
 <code>./UCI HAR Dataset/output</code>  
@@ -226,19 +240,27 @@ relative to the current working directory.  The **output** directory contains 7 
 
 <div id='id-tidy'/>
 ## The Tidy Data Set
-The wide form of the tidy data set was selected as the output form for two reasons.  First, because the form tidy data takes is primarily driven by the type of downstream analysis which needs to be performed and the downstream analysis was specified.  Second, because the downstream analysis was not specified, the form that is easiest to provide and explain was selected.
-
-The final output of step 5. is a tidy dataset because it conforms to the three rules of "_**tidy data**_" (Wickam 2014) \[[2](#id-refs)\] sets:
+According to (Wickham 2014) \[[2](#id-refs)\], data is considered **tidy** when they possess three characteristics:
 
 1. Each variable forms a column
-  - There are 68 variables: **activity**, **subject**, and 66 **MeanOf...** values (described in CodeBook.md)
 2. Each observation forms a row
-  - There are 180 rows of data which is what we would expect when grouping by 30 subjects and 6 activities
 3. Each type of observational unit forms a table
-  - An argument could be made for additional tables based on different types of measurements, but for the purposes of this project the assumption of a single observational unit was applied to all the features in the training and testing datasets.
+
+This definition leaves room for what might be called a _wide form_ and a _narrow form_.  The narrow form collapses or _melts_ \[[4](#id-refs)\] columns with common value types into a single column such as shown in Table 5. of the Wickham paper:
+
+![Molten table example](https://www.dropbox.com/s/6t04fxyozi3enp6/wickham_table5.jpg)
+
+When columns headers are themselves values and not variable names, the data is not considered tidy \[[4](#id-refs)\].  In such a case, melting is performed as a part of making the data tidy.  However, if column headers are truly variable names, then melting is optional because it not required to make the data tidy.  When a tidy dataset is put into a molten form, that dataset is considered to be in the _narrow form_.  If the same tidy data set is not melted, it is considered to be in the _wide form_.
+
+The wide form of the tidy data set was selected as the output form of the table resulting from step 5. processing.  This was done for the following reasons:
+
+1. It is more space efficient.  The wide form dimensions of the step 5. output is 68 rows by 180 columns or 12,240 cells.  The narrow form would collapse (melt) 66 of the 68 wide form columns into one single column and add an additional column for the values.  The number of narrow form rows would be = (68 - 2) x (180) = 11,880.  Therefore, the narrow form dimensions would be 4 x 11,880 or 47,520 cells.
+2. The form tidy data takes is primarily driven by the type of downstream analysis which needs to be performed.  Since the type of downstream analysis was not specified, the form that is most space efficient, computationally cheapest (converting to the narrow form would have required additional processing) and easiest to provide (more work/code to reshape the data would have been needed) was selected.
 
 <div id='id-refs'/>
 ## References
 
-[1] Wickam H (2014). "_Tidy Data_ ". "_Journal of Statistical Software_" **59**(10), 1.  URL http://www.jstatsoft.org/v59/i10/paper  
-[2] Wickam H (2014). "_Tidy Data_ ". "_Journal of Statistical Software_" **59**(10), 4.  URL http://www.jstatsoft.org/v59/i10/paper
+[1] Wickham H (2014). "_Tidy Data_ ". "_Journal of Statistical Software_" **59**(10), page 1.  URL [http://www.jstatsoft.org/v59/i10/paper](http://www.jstatsoft.org/v59/i10/paper)  
+[2] Wickham H (2014). "_Tidy Data_ ". "_Journal of Statistical Software_" **59**(10), page 4.  URL [http://www.jstatsoft.org/v59/i10/paper](http://www.jstatsoft.org/v59/i10/paper)  
+[3] Knuth D E (1974). "_Computer Programming as an art_". "_Communcations of the ACM_" **17**(12), 671.  URL [http://delivery.acm.org/10.1145/370000/361612/a1974-knuth.pdf](http://delivery.acm.org/10.1145/370000/361612/a1974-knuth.pdf)  
+[4] Wickham H (2014). "_Tidy Data_ ". "_Journal of Statistical Software_" **59**(10), pages 5-6.  URL [http://www.jstatsoft.org/v59/i10/paper](http://www.jstatsoft.org/v59/i10/paper)  
