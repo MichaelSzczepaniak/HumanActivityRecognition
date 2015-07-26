@@ -226,8 +226,11 @@ readXFromRawData <- function(testData) {
     # X_train.txt and X_test.txt files are both fixed width and have
     # 561 factors (variables). Each value is 15 characters seperated by
     # a space.
-    #xdata <- read.fwf(file = rawDataFilePath, rep(c(-1, 15), 561))
-    xdata <- fastFwfRead(rawDataFilePath)
+    #xdata <- read.fwf(file = rawDataFilePath, rep(c(-1, 15), 561)) # slow way
+    
+    colWidths <- rep(c(1, 15), 561)
+    colTypes <- rep(c('character', 'numeric'), 561)
+    xdata <- fastFwfRead(rawDataFilePath, colWidths, colTypes)
     
     return(xdata)
 }
@@ -349,10 +352,9 @@ appendSubjectColumn <- function(xdata) {
 
 ## High performance FWF reads of X_test.txt and X_train.txt based on:
 ## http://stackoverflow.com/questions/18720036/reading-big-data-with-fixed-width
-fastFwfRead <- function(rawDataFilePath) {
-    data.laf <- laf_open_fwf(rawDataFilePath,
-                             column_widths=rep(c(1, 15), 561),
-                             column_types=rep(c('character', 'numeric'), 561))
+fastFwfRead <- function(rawDataFilePath, colWidths, colTypes) {
+    data.laf <- laf_open_fwf(rawDataFilePath, column_widths=colWidths,
+                             column_types=colTypes)
     data.ffdf <- laf_to_ffdf(data.laf, nrows=7352)
     data.df <- as.data.frame(data.ffdf)
     keep <- seq(2, 1122, 2)
