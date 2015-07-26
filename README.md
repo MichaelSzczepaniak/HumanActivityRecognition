@@ -168,7 +168,27 @@ The fastest mode of operation is to run the script using the _fromDeparsed_ opti
 to generate the output **which took less than 1 minute to run on my system.**.
 
 #### Improving performance
-In keeping with the spirit of avoiding the trap of "premature optimization is the root of all evil" (Knuth 1974) \[[3](#id-refs)\], attempting to improve the performance wasn't attempted until late in the project.
+In keeping with the spirit of avoiding the trap of "premature optimization is the root of all evil" (Knuth 1974) \[[3](#id-refs)\], work to improve the performance wasn't attempted until late in the project.  With only a few hours before the deadline, I did find something that would dramatically improve performance of reading the large txt files into a dataframe (jwijffels 2013) \[[5](#id-refs)\].  Instead of reading in the dataframe like this:
+
+<pre>xdata <- read.fwf(file = rawDataFilePath, rep(c(-1, 15), 561))</pre>
+
+The prototype code (used on the command line) which I got working looked like this:
+
+<pre>
+library(LaF)
+library(ffbase)
+
+rawDataFilePath <- paste0("./UCI HAR Dataset/test", "/X_train.txt")
+xdata.laf <- laf_open_fwf(rawDataFilePath,
+                          column_widths=rep(c(1, 15), 561),
+                          column_types=rep(c('character', 'numeric'), 561))
+xdata.ffdf <- laf_to_ffdf(xdata.laf, nrows=7352)
+xdata <- as.data.frame(xdata.ffdf)
+keep <- seq(2, 1122, 2)
+xdata <- xdata[, keep]
+</pre>
+
+This reduced reading the X\_train.txt file from ~ 5.5 minutes to just under 10 seconds!  When I built a function from this code and used it however, I ran into some strange errors which need debugging.
 
 <div id='id-codebook'/>
 ## Code Book
@@ -272,3 +292,4 @@ The wide form of the tidy data set was selected as the output form of the table 
 [2] Wickham H (2014). "_Tidy Data_ ". "_Journal of Statistical Software_" **59**(10), page 4.  URL [http://www.jstatsoft.org/v59/i10/paper](http://www.jstatsoft.org/v59/i10/paper)  
 [3] Knuth D E (1974). "_Computer Programming as an art_". "_Communcations of the ACM_" **17**(12), 671.  URL [http://delivery.acm.org/10.1145/370000/361612/a1974-knuth.pdf](http://delivery.acm.org/10.1145/370000/361612/a1974-knuth.pdf)  
 [4] Wickham H (2014). "_Tidy Data_ ". "_Journal of Statistical Software_" **59**(10), pages 5-6.  URL [http://www.jstatsoft.org/v59/i10/paper](http://www.jstatsoft.org/v59/i10/paper)  
+[5] Post by jwijffels at [http://stackoverflow.com/questions/18720036/reading-big-data-with-fixed-width](http://stackoverflow.com/questions/18720036/reading-big-data-with-fixed-width)
