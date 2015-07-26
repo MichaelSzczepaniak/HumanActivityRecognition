@@ -156,3 +156,20 @@ downloaded 59.7 MB
 11:56:15 Append descriptive activities: step 3. complete.
 11:56:17 Append subject and make descriptive col names: step 4. complete.
 11:56:17 Summarize variable by subject & activity: step 5. complete.
+
+## After implementing fastFwfRead function
+> run_analysis()  # less than a 1.5 minutes, almost an order of magnitude improvement!
+16:55:24  Start reading X_test.txt data file into dataframe.
+16:55:31  Finished reading X_test.txt data file into dataframe.
+16:55:31  Start reading X_train.txt data file into dataframe.
+16:55:39  Finished reading X_train.txt data file into dataframe.
+          Start dput of test data...
+16:55:45  Finished dput of xtestdf.R. Start dput of train data.
+16:56:00  Finished dput of xtraindf.R.
+16:56:01 Deparsed HAR X data file creations complete. Start reading...
+16:56:20 reading deparsed HAR dataframes complete...
+16:56:35 addOriginalFeaturesAsHeaders completed.
+16:56:37 Removal of unneeded columns: step 2. complete.
+16:56:39 Append descriptive activities: step 3. complete.
+16:56:41 Append subject and make descriptive col names: step 4. complete.
+16:56:41 Summarize variable by subject & activity: step 5. complete.

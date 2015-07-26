@@ -159,36 +159,93 @@ run_analysis <- function(options = "fromLocalZip",
 
 <div id='id-perf'/>
 ### Performance
-Running **run\_analysis()** using all the default settings for the parameters took about 8.5 to 9 minutes.  Data for several runs were collected and stored in the [**performance.txt**](https://github.com/MichaelSzczepaniak/HumanActivityRecognition/blob/master/performance.txt) file located in the root directory of this project.  These runs were done on my i7 laptop with 16 Gb of RAM running 64 bit Window 7 Pro.
+Running **run\_analysis()** using all the default settings for the parameters used to take about 9 minutes.  Data for several runs were collected and stored in the [**performance.txt**](https://github.com/MichaelSzczepaniak/HumanActivityRecognition/blob/master/performance.txt) file located in the root directory of this project.  These runs were done on my i7 laptop with 16 Gb of RAM running 64 bit Window 7 Pro.  This was greatly enhanced with some help from the **LaF** and **ffbase** libraries as explained below.
 
-The fastest mode of operation is to run the script using the _fromDeparsed_ option **if the script as been run as least one time before and has generated the deparsed training and testing objects**.  If the <code>./UCI HAR Dataset/output/xtestdf.R</code> and <code>./UCI HAR Dataset/output/xtraindf.R</code> files have been built, then one could run:  
+The fastest mode of operation however, is to run the script using the _fromDeparsed_ option **if the script as been run as least one time before and has generated the deparsed training and testing objects**.  If the <code>./UCI HAR Dataset/output/xtestdf.R</code> and <code>./UCI HAR Dataset/output/xtraindf.R</code> files have been built, then one could run:  
 
 <code>run_analysis(options = "fromDeparsed")</code>  
 
 to generate the output **which took less than 1 minute to run on my system.**.
 
 #### Improving performance
-In keeping with the spirit of avoiding the trap of "premature optimization is the root of all evil" (Knuth 1974) \[[3](#id-refs)\], work to improve the performance wasn't attempted until late in the project.  With only a few hours before the deadline, I did find something that would dramatically improve performance of reading the large txt files into a dataframe (jwijffels 2013) \[[5](#id-refs)\].  Instead of reading in the dataframe like this:
-
-<pre>xdata <- read.fwf(file = rawDataFilePath, rep(c(-1, 15), 561))</pre>
-
-The prototype code (used on the command line) which I got working looked like this:
+In keeping with the spirit of avoiding the trap of "premature optimization is the root of all evil" (Knuth 1974) \[[3](#id-refs)\], work to improve the performance wasn't attempted until late in the project.  With only a couple hours before the deadline, I did find something that would dramatically improve performance of reading the large txt files into a dataframe (jwijffels 2013) \[[5](#id-refs)\].  Instead of reading in the dataframe like this:
 
 <pre>
+library(dplyr)
+library(downloader)
 library(LaF)
 library(ffbase)
 
-rawDataFilePath <- paste0("./UCI HAR Dataset/test", "/X_train.txt")
-xdata.laf <- laf_open_fwf(rawDataFilePath,
-                          column_widths=rep(c(1, 15), 561),
-                          column_types=rep(c('character', 'numeric'), 561))
-xdata.ffdf <- laf_to_ffdf(xdata.laf, nrows=7352)
-xdata <- as.data.frame(xdata.ffdf)
-keep <- seq(2, 1122, 2)
-xdata <- xdata[, keep]
+## ... other code from run_analysis.R ...
+
+## Reads the data from a raw HAR data file and returns a dataframe.
+## testData - TRUE if file to be read is the X_test.txt file
+##            FALSE if the file to be read is the X_train.txt file
+readXFromRawData <- function(testData) {
+    rawDataFilePath <- NULL
+    if(testData) {
+        rawDataFilePath <- paste0(testDir, "/X_test.txt")
+    }
+    else {
+        rawDataFilePath <- paste0(trainDir, "/X_train.txt")
+    }
+    # X_train.txt and X_test.txt files are both fixed width and have
+    # 561 factors (variables). Each value is 15 characters seperated by
+    # a space.
+    xdata <- read.fwf(file = rawDataFilePath, rep(c(-1, 15), 561))
+    
+    return(xdata)
+}
 </pre>
 
-This reduced reading the X\_train.txt file from ~ 5.5 minutes to just under 10 seconds!  When I built a function from this code and used it however, I ran into some strange errors which need debugging.
+It is now read in like this:
+
+<pre>
+library(dplyr)
+library(downloader)
+library(LaF)
+library(ffbase)
+
+## ... other code from run_analysis.R ...
+
+## Reads the data from a raw HAR data file and returns a dataframe.
+## testData - TRUE if file to be read is the X_test.txt file
+##            FALSE if the file to be read is the X_train.txt file
+readXFromRawData <- function(testData) {
+    rawDataFilePath <- NULL
+    if(testData) {
+        rawDataFilePath <- paste0(testDir, "/X_test.txt")
+    }
+    else {
+        rawDataFilePath <- paste0(trainDir, "/X_train.txt")
+    }
+    # X_train.txt and X_test.txt files are both fixed width and have
+    # 561 factors (variables). Each value is 15 characters seperated by
+    # a space.
+    
+    xdata <- fastFwfRead(rawDataFilePath)
+    
+    return(xdata)
+}
+
+## ... other code from run_analysis.R ...
+
+## High performance FWF reads of X_test.txt and X_train.txt based on:
+## http://stackoverflow.com/questions/18720036/reading-big-data-with-fixed-width
+fastFwfRead <- function(rawDataFilePath) {
+    data.laf <- laf_open_fwf(rawDataFilePath,
+                             column_widths=rep(c(1, 15), 561),
+                             column_types=rep(c('character', 'numeric'), 561))
+    data.ffdf <- laf_to_ffdf(data.laf, nrows=7352)
+    data.df <- as.data.frame(data.ffdf)
+    keep <- seq(2, 1122, 2)
+    data.df <- data.df[, keep]
+    
+    return(data.df)
+}
+</pre>
+
+The implementation of **fastFwfRead** reduced running the analysis from about 9 minutes down to about 1.5 minutes!
 
 <div id='id-codebook'/>
 ## Code Book
