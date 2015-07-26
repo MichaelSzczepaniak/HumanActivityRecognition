@@ -4,7 +4,7 @@
 - [Description](#id-description)  
 - [Running the Analysis](#id-running-the-analysis)  
 - [Code Book](#id-codebook)  
-- [Raw and Prcessed Data](#id-data)
+- [Raw and Processed Data](#id-data)
 - [The Tidy Data Set](#id-tidy)
 - [References](#id-refs)
 
@@ -49,6 +49,114 @@ The project consists of
 
 <div id='id-running-the-analysis'/>
 ## Running the Analysis
+### Simple way to run the script
+The simplest way to run the analysis is to follow these steps:  
+
+1. Download the **run_analysis.R** script from this project to a directory which you will use as you workspace.
+2. Download the **UCI HAR Dataset.zip** file of the raw data set from the url listed below:
+  - [https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip](https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip)
+3. If the downloaded file is not named **UCI HAR Dataset.zip**, rename it so that it is.
+4. Start up R and set your workspace to the directory where you downloaded the **run_analysis.R** script and the **UCI HAR Dataset** dataset file.
+5. Source the **run_analysis.R** script by running <code>source("run_analysis.R")</code>
+6. Type <code>run_analysis()</code> (no arguments) at the prompt after R has finished sourcing the script file and hit <code>Enter</code>.
+
+The script will explode the zip file, read in the raw data files described in the **Raw Data** subsection of [**Raw and Processed Data**](#id-data) section and generate the files described in the **Processed Data** subsection of [**Raw and Processed Data**](#id-data) section which includes the tidy summarized output data set.  
+
+**IMPORTANT NOTE: This mode of operation took about 8.5 minutes to run on my i7 laptop with 16 Gb of RAM, so be patient.**
+
+### Other ways to run the script
+The script has 4 parameters which can be set to run the script in different modes.  The comments for the **run_analysis()** function are provided below along with signature of the function.
+
+<pre>
+## This function takes four parameters:
+##
+## options - This tells the function how to obtain the data for the analysis.
+##           The three allowed values are: "fromLocalZip", "fromScratch" or
+##           "fromDeparsed".  These options can be described as follows:
+##
+##           "fromLocalZip" (default) - This directs the function to look for a
+##                                      zip data file specified by the zipFile
+##                                      parameter in the same directory from  
+##                                      which this script is being run.
+##           "fromDeparsed" - This directs the function to look for two deparsed
+##                            dataframe object files that were constructed from
+##                            the x_test.txt and x_train.txt files.  To run this
+##                            option successfully, the function must be run
+##                            using either the "fromLocalZip" or "fromScratch"
+##                            options at least once before in order for the
+##                            deparsed object files to be built.
+##            "fromScratch" - This directs the function to download the zip
+##                            file from the internet before proceeding with the
+##                            analysis.  This option took just under 9 minutes
+##                            on my i7 laptop with 16Gb of RAM, but should be
+##                            used if the two other options fail to work.
+##  zipFile - This is the name of the zip file of the dataset used for the 
+##            analysis. Default value: "UCI HAR Dataset.zip"
+##  zipDir - This is the directory which the script expects the raw data from
+##           the exploded zip to reside. Default value is 'UCI HAR Dataset'
+##  zipUrl - This is the url used to download the zip file for the dataset when
+##           options = "fromScratch".  The default value is:
+##  https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip
+##
+## Here is a description of the exection steps taken by the function:
+##
+## 1) If option = "fromScratch", the HAR zip file is downloaded using the
+##    default value for zipUrl as described above.
+##    If options = "fromLocalZip" (default) or "fromDeparsed", skip to step 2)
+## 2) If options = "fromLocalZip" (default), the file specified by zipFile is
+##    read from the directory which this script is being run from, and the zip
+##    file is exploded into a directory names "UCI HAR Dataset". An error will
+##    result if the zip file could not be found or if the zip file explosion
+##    creates a directory named something other than "UCI HAR Dataset".
+## 3) The test and train feature data is then read into 2 data frames (dfs).
+## 4) The test and train dfs are deparsed and written to the files:
+##    UCI HAR Dataset/outputs/xtestdf.R and UCI HAR Dataset/outputs/xtraindf.R
+##    respectively.  NOTE: This was done so that successive runs using:
+##    options = "fromDeparsed" could bypass steps 1) through 3) to speed
+##    successive executions.
+## 5) The deparsed dfs created in step 3) are read into two dfs in memory:
+## 6) The xtestdata and xtraindata dfs are combined into a single dataframe
+##    called xdata.  This completed step 1. of the analysis as described in the
+##    README.md file.
+## 7) The feature.txt file is read and the feature names were set as the
+##    column names for xdata.
+## 8) The xdata df was subsetted to include only features that had "mean()" or
+##    "std()" in their column names.  This completed step 2. of the analysis as
+##    described in the README.md file.
+## 9) The activities files (y_test.txt and y_train.txt) were read, a vector was
+##    was built with the values from these files, the values in the vector were
+##    replaced by the names of the activities defines in the
+##    activities_labels.txt file, and then the updated vector was column bound
+##    to the xdata df.  This completed step 3. of the analysis as described in
+##    the README.md file.
+##10) The column names of the features were revised to be more readable and
+##    descriptive.  This completed step 4. of the analysis as described in the
+##    README.md file.
+##11) The xdata resulting from 10) was grouped by activity and subject and
+##    summarized by applying the mean to each group of variable.
+##12) The summarize table from 11) was then written a file called:
+##    HARByActivityAndSubject.txt  using the command:
+##
+##    write.table(summarizedByActivityAndSubject,
+##                file = "./output/HARByActivityAndSubject.txt"),
+##                row.names = FALSE)
+##
+## If options is set to "fromDeparsed", this function needs to have been
+## executed at least one time prior using options = "fromScratch" in order to
+## build the deparsed xtestdf.R and xtraindf.R object files which the function
+## reads in as described in step 4)
+## 
+run_analysis <- function(options = "fromLocalZip",
+                         zipFile = "UCI HAR Dataset.zip",
+                         zipDir = "UCI HAR Dataset",
+                         zipUrl = "https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip") {
+</pre>
+
+The fastest mode of operation is to run the script using the _fromDeparsed_ options **if the script as been run as least one time before and has generated the deparsed training and testing objects**.  If the <code>./UCI HAR Dataset/output/xtestdf.R</code> and <code>./UCI HAR Dataset/output/xtraindf.R</code> files have been built, then one could run:  
+
+<code>run_analysis(options = "fromDeparsed")</code>  
+
+to generate the output **much faster than the default mode**.
 
 <div id='id-codebook'/>
 ## Code Book

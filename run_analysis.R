@@ -3,7 +3,7 @@ library(downloader)
 
 ## Michael Szczepaniak - July 2015
 ##
-## This function takes three parameter:
+## This function takes four parameters:
 ##
 ## options - This tells the function how to obtain the data for the analysis.
 ##           The three allowed values are: "fromLocalZip", "fromScratch" or
@@ -27,6 +27,8 @@ library(downloader)
 ##                            used if the two other options fail to work.
 ##  zipFile - This is the name of the zip file of the dataset used for the 
 ##            analysis. Default value: "UCI HAR Dataset.zip"
+##  zipDir - This is the directory which the script expects the raw data from
+##           the exploded zip to reside. Default value is 'UCI HAR Dataset'
 ##  zipUrl - This is the url used to download the zip file for the dataset when
 ##           options = "fromScratch".  The default value is:
 ##  https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip
