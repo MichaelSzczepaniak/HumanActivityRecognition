@@ -168,7 +168,7 @@ The fastest mode of operation however, is to run the script using the _fromDepar
 to generate the output **which took less than 1 minute to run on my system.**.
 
 #### Improving performance
-In keeping with the spirit of avoiding the trap of "premature optimization is the root of all evil" (Knuth 1974) \[[3](#id-refs)\], work to improve the performance wasn't attempted until late in the project.  With only a couple hours before the deadline, I did find something that would dramatically improve performance of reading the large txt files into a dataframe (jwijffels 2013) \[[5](#id-refs)\].  Instead of reading in the dataframe like this:
+In keeping with the spirit of avoiding the trap of "premature optimization is the root of all evil" (Knuth 1974) \[[3](#id-refs)\], work to improve the performance wasn't attempted until late in the project.  With only a couple hours before the deadline, I did find something that would dramatically improve performance of reading the large txt files into a dataframe (jwijffels 2013) \[[5](#id-refs)\].  Instead of reading in dataframes like this:
 
 <pre>
 library(dplyr)
