@@ -1,6 +1,6 @@
 # Human Activity Recognition Codebook
 
-## Description of the Measurement Variables and how they were renamed
+## Description of the Variables and how they were Renamed
 All variables except **activity** and **subject** are prefixed with **MeanOf** to call out the fact that these are calculated means of values described in the [**features_info.txt**](https://github.com/MichaelSzczepaniak/HumanActivityRecognition/blob/master/UCI%20HAR%20Dataset/features_info.txt) file and are listed in the [**features.txt**](https://github.com/MichaelSzczepaniak/HumanActivityRecognition/blob/master/UCI%20HAR%20Dataset/features.txt) file included in the zip file of the original data.  These values represent "means of means" or "means of standard deviations" as described below.
 
 Variable names prefixed with **MeanOfTime** are means calculated from original variables that were prefixed with **t** and represent time based measurements captured at a sampling rate of 50 Hz.
