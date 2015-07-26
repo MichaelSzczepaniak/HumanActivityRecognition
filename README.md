@@ -248,7 +248,7 @@ According to (Wickham 2014) \[[2](#id-refs)\], data is considered **tidy** when 
 
 This definition leaves room for what might be called a _wide form_ and a _narrow form_.  The narrow form collapses or _melts_ \[[4](#id-refs)\] columns with common value types into a single column such as shown in Table 5. of the Wickham paper:
 
-![Molten table example](https://www.dropbox.com/s/6t04fxyozi3enp6/wickham_table5.jpg)
+![Molten table example](https://dl.dropboxusercontent.com/s/6t04fxyozi3enp6/wickham_table5.jpg)
 
 When columns headers are themselves values and not variable names, the data is not considered tidy \[[4](#id-refs)\].  In such a case, melting is performed as a part of making the data tidy.  However, if column headers are truly variable names, then melting is optional because it not required to make the data tidy.  When a tidy dataset is put into a molten form, that dataset is considered to be in the _narrow form_.  If the same tidy data set is not melted, it is considered to be in the _wide form_.
 
