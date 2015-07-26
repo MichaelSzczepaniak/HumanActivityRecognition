@@ -173,3 +173,53 @@ downloaded 59.7 MB
 16:56:39 Append descriptive activities: step 3. complete.
 16:56:41 Append subject and make descriptive col names: step 4. complete.
 16:56:41 Summarize variable by subject & activity: step 5. complete.
+
+> source("run_analysis.R")
+> run_analysis()
+17:36:54  Start reading X_test.txt data file into dataframe.
+17:37:00  Finished reading X_test.txt data file into dataframe.
+17:37:00  Start reading X_train.txt data file into dataframe.
+17:37:09  Finished reading X_train.txt data file into dataframe.
+          Start dput of test data...
+17:37:15  Finished dput of xtestdf.R. Start dput of train data.
+17:37:30  Finished dput of xtraindf.R.
+17:37:30 Deparsed HAR X data file creations complete. Start reading...
+17:37:49 reading deparsed HAR dataframes complete...
+17:38:04 addOriginalFeaturesAsHeaders completed.
+17:38:06 Removal of unneeded columns: step 2. complete.
+17:38:08 Append descriptive activities: step 3. complete.
+17:38:10 Append subject and make descriptive col names: step 4. complete.
+17:38:10 Summarize variable by subject & activity: step 5. complete.
+> source("run_analysis.R")
+> run_analysis()
+17:49:13  Start reading X_test.txt data file into dataframe.
+17:49:20  Finished reading X_test.txt data file into dataframe.
+17:49:20  Start reading X_train.txt data file into dataframe.
+17:49:28  Finished reading X_train.txt data file into dataframe.
+          Start dput of test data...
+17:49:34  Finished dput of xtestdf.R. Start dput of train data.
+17:49:50  Finished dput of xtraindf.R.
+17:49:50 Deparsed HAR X data file creations complete. Start reading...
+17:50:11 reading deparsed HAR dataframes complete...
+17:50:25 addOriginalFeaturesAsHeaders completed.
+17:50:26 Removal of unneeded columns: step 2. complete.
+17:50:29 Append descriptive activities: step 3. complete.
+17:50:31 Append subject and make descriptive col names: step 4. complete.
+17:50:31 Summarize variable by subject & activity: step 5. complete.
+> 
+> source("run_analysis.R")
+> run_analysis()
+17:51:31  Start reading X_test.txt data file into dataframe.
+17:51:38  Finished reading X_test.txt data file into dataframe.
+17:51:38  Start reading X_train.txt data file into dataframe.
+17:51:46  Finished reading X_train.txt data file into dataframe.
+          Start dput of test data...
+17:51:52  Finished dput of xtestdf.R. Start dput of train data.
+17:52:08  Finished dput of xtraindf.R.
+17:52:08 Deparsed HAR X data file creations complete. Start reading...
+17:52:27 reading deparsed HAR dataframes complete...
+17:52:42 addOriginalFeaturesAsHeaders completed.
+17:52:44 Removal of unneeded columns: step 2. complete.
+17:52:46 Append descriptive activities: step 3. complete.
+17:52:48 Append subject and make descriptive col names: step 4. complete.
+17:52:48 Summarize variable by subject & activity: step 5. complete.
