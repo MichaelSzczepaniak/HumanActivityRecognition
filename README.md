@@ -28,13 +28,13 @@ The purpose of this project is to demonstrate the "_ability to collect, work wit
   - This summary file was written out using:  
     <pre>
     write.table(summarizedByActivityAndSubject,
-                    file = paste0(outputDir, "./HARByActivityAndSubject.txt"),
-                    row.names = FALSE)
+                file = paste0(outputDir, "./HARByActivityAndSubject.txt"),
+                row.names = FALSE)
     </pre> where <code>outputDir = ./UCI HAR Dataset/output</code> relative to the current working directory.
   - The summaray file is called [HARByActivityAndSubject.txt](https://github.com/MichaelSzczepaniak/HumanActivityRecognition/blob/master/UCI%20HAR%20Dataset/output/HARByActivityAndSubject.txt) and can be read in using:
   <pre>
   finalTable <- read.table("./UCI HAR Dataset/output/HARByActivityAndSubject.txt",
-                                  header = TRUE, sep = " ")
+                               header = TRUE, sep = " ")
   </pre>
   from the current working directory.
 
@@ -60,6 +60,7 @@ The code book for this project is provided in the [**CodeBook.md** file](https:/
 
 <div id='id-data'/>
 ## Raw and Processed Data
+### Raw Data
 The raw data for this project was obtained from here:
 
 [https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip](https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip)
@@ -92,11 +93,44 @@ and is located in the [**UCI HAR Dataset**](https://github.com/MichaelSzczepania
     - 2947 records, single field
     - ~8 Kb
 
+### Processed Data
+The processed data for this project is the data outputted by the **run_analysis()** function and resides in  
+<code>./UCI HAR Dataset/output</code>  
+relative to the current working directory.  The **output** directory contains 7 files:  
+
+  - [HARByActivityAndSubject](https://github.com/MichaelSzczepaniak/HumanActivityRecognition/blob/master/UCI%20HAR%20Dataset/output/HARByActivityAndSubject.txt)
+    - output from the completion of step 5. processing as described in the [**Description**](#id-description) section
+    - This is the final output of the tidy dataset which was the objective of this project.
+  - step1.txt
+    - output from the completion of step 1. processing as described in the [**Description**](#id-description) section
+  - step2.txt
+    - output from the completion of step 2. processing as described in the [**Description**](#id-description) section
+  - step3.txt
+    - output from the completion of step 3. processing as described in the [**Description**](#id-description) section
+  - step4.txt
+    - output from the completion of step 4. processing as described in the [**Description**](#id-description) section
+  - xtestdf.R
+    - deparsed dataframe resulting from reading in the **X\_test.txt** file.
+    - This enables the options = "fromDeparsed" mode along with **xtraindf.R** of running the **run\_analysis()** script which is the fastest mode of operation.
+  - xtraindf.R
+    - deparsed dataframe resulting from reading in the **X\_train.txt** file.
+    - This enables the options = "fromDeparsed" mode along with **xtestdf.R** of running the **run\_analysis()** script which is the fastest mode of operation.
+
 <div id='id-tidy'/>
 ## The Tidy Data Set
+The wide form of the tidy data set was selected as the output form for two reasons.  First, because the form tidy data takes is primarily driven by the type of downstream analysis which needs to be performed and the downstream analysis was specified.  Second, because the downstream analysis was not specified, the form that is easiest to provide and explain was selected.
+
+The final output of step 5. is a tidy dataset because it conforms to the three rules of "_**tidy data**_" (Wickam 2014) \[[2](#id-refs)\] sets:
+
+1. Each variable forms a column
+  - There are 68 variables: **activity**, **subject**, and 66 **MeanOf...** values (described in CodeBook.md)
+2. Each observation forms a row
+  - There are 180 rows of data which is what we would expect when grouping by 30 subjects and 6 activities
+3. Each type of observational unit forms a table
+  - An argument could be made for additional tables based on different types of measurements, but for the purposes of this project the assumption of a single observational unit was applied to all the features in the training and testing datasets.
 
 <div id='id-refs'/>
 ## References
 
-[1] Wickam H (2014). "_Tidy Data_ ". "_Journal of Statistical Software_" **59**(10), 1.  URL http://www.jstatsoft.org/v59/i10/paper
-
+[1] Wickam H (2014). "_Tidy Data_ ". "_Journal of Statistical Software_" **59**(10), 1.  URL http://www.jstatsoft.org/v59/i10/paper  
+[2] Wickam H (2014). "_Tidy Data_ ". "_Journal of Statistical Software_" **59**(10), 4.  URL http://www.jstatsoft.org/v59/i10/paper
