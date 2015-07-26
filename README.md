@@ -58,19 +58,19 @@ The project consists of
 ### Simple way to run the analysis script
 The simplest way to run the analysis is to follow these steps:  
 
-1. Download the **run_analysis.R** script from this project to a directory which you will use as you workspace.
+1. Download the **run_analysis.R** script from this project to a directory which you will use as your workspace.
 2. Download the **UCI HAR Dataset.zip** file of the raw data set from the url listed below:
   - [https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip](https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip)
 3. If the downloaded file is not named **UCI HAR Dataset.zip**, rename it so that it is.
-4. Start up R and set your workspace to the directory where you downloaded the **run_analysis.R** script and the **UCI HAR Dataset** dataset file.
+4. Start up R and set your workspace to the directory where you downloaded the **run_analysis.R** script and the **UCI HAR Dataset.zip** data files.
 5. Source the **run_analysis.R** script by running <code>source("run_analysis.R")</code>
 6. Type <code>run_analysis()</code> (no arguments) at the prompt after R has finished sourcing the script file and hit <code>Enter</code>.
 
-The script will explode the zip file, read in the raw data files described in the **Raw Data** subsection of [**Raw and Processed Data**](#id-data) section and generate the files described in the **Processed Data** subsection of [**Raw and Processed Data**](#id-data) section which includes the tidy summarized output data set.  
+The script will explode the zip file, read in the raw data files described in the [**Raw Data**](#id-raw) section and generates the files described in the [**Processed Data**](#id-processed) section which includes the tidy summarized output data set.  
 
 <div id='id-other'/>
 ### Other ways to run the analysis script
-The script has 4 parameters which can be set to run the script in different modes.  The comments for the **run_analysis()** function are provided below along with the signature of the function.
+The script has 4 parameters which can be set to run the script in different modes.  For those who wish a deeper understanding of how the script works and/or wish to explore utilizing the different execution modes, the comments for the **run\_analysis()** function are provided below along with the signature of the function.
 
 <pre>
 ## This function takes four parameters:
@@ -159,9 +159,9 @@ run_analysis <- function(options = "fromLocalZip",
 
 <div id='id-perf'/>
 ### Performance
-Running **run\_analysis()** using all the default settings for the parameters took about 8.5 to 9 minutes.  Data for several runs were collected and stored in the [**performance.txt**](https://github.com/MichaelSzczepaniak/HumanActivityRecognition/blob/master/performance.txt) in the root directory of this project.  These runs were done on my i7 laptop with 16 Gb of RAM running 64 bit Window 7 Pro.
+Running **run\_analysis()** using all the default settings for the parameters took about 8.5 to 9 minutes.  Data for several runs were collected and stored in the [**performance.txt**](https://github.com/MichaelSzczepaniak/HumanActivityRecognition/blob/master/performance.txt) file located in the root directory of this project.  These runs were done on my i7 laptop with 16 Gb of RAM running 64 bit Window 7 Pro.
 
-The fastest mode of operation is to run the script using the _fromDeparsed_ options **if the script as been run as least one time before and has generated the deparsed training and testing objects**.  If the <code>./UCI HAR Dataset/output/xtestdf.R</code> and <code>./UCI HAR Dataset/output/xtraindf.R</code> files have been built, then one could run:  
+The fastest mode of operation is to run the script using the _fromDeparsed_ option **if the script as been run as least one time before and has generated the deparsed training and testing objects**.  If the <code>./UCI HAR Dataset/output/xtestdf.R</code> and <code>./UCI HAR Dataset/output/xtraindf.R</code> files have been built, then one could run:  
 
 <code>run_analysis(options = "fromDeparsed")</code>  
 
@@ -209,10 +209,18 @@ and is located in the [**UCI HAR Dataset**](https://github.com/MichaelSzczepania
     - 561 records, single field
     - described in the [**features\_info.txt**](https://github.com/MichaelSzczepaniak/HumanActivityRecognition/blob/master/UCI%20HAR%20Dataset/features_info.txt) file
     - ~16 Kb
+  - [y_train](https://github.com/MichaelSzczepaniak/HumanActivityRecognition/blob/master/UCI%20HAR%20Dataset/train/y_train.txt)
+    - list of activities performed corresponding to the training data set subjects
+    - 7352 records, single field
+    - ~15 kb
   - [subject\_test.txt](https://github.com/MichaelSzczepaniak/HumanActivityRecognition/blob/master/UCI%20HAR%20Dataset/test/subject_test.txt)
     - list of subjects corresponding to the testing data set activities
     - 2947 records, single field
     - ~8 Kb
+  - [y_test](https://github.com/MichaelSzczepaniak/HumanActivityRecognition/blob/master/UCI%20HAR%20Dataset/test/y_test.txt)
+    - list of activities performed corresponding to the testing data set subjects
+    - 2947 records, single field
+    - ~8 kb
 
 <div id='id-processed'/>
 ### Processed Data
@@ -233,10 +241,10 @@ relative to the current working directory.  The **output** directory contains 7 
     - output from the completion of step 4. processing as described in the [**Description**](#id-description) section
   - xtestdf.R
     - deparsed dataframe resulting from reading in the **X\_test.txt** file.
-    - This enables the options = "fromDeparsed" mode along with **xtraindf.R** of running the **run\_analysis()** script which is the fastest mode of operation.
+    - This enables the options = "fromDeparsed" mode along with **xtraindf.R** for running the **run\_analysis()** script in its fastest mode of operation.
   - xtraindf.R
     - deparsed dataframe resulting from reading in the **X\_train.txt** file.
-    - This enables the options = "fromDeparsed" mode along with **xtestdf.R** of running the **run\_analysis()** script which is the fastest mode of operation.
+    - This enables the options = "fromDeparsed" mode along with **xtestdf.R** for running the **run\_analysis()** script in its fastest mode of operation.
 
 <div id='id-tidy'/>
 ## The Tidy Data Set
@@ -250,7 +258,7 @@ This definition leaves room for what might be called a _wide form_ and a _narrow
 
 ![Molten table example](https://dl.dropboxusercontent.com/s/6t04fxyozi3enp6/wickham_table5.jpg)
 
-When columns headers are themselves values and not variable names, the data is not considered tidy \[[4](#id-refs)\].  In such a case, melting is performed as a part of making the data tidy.  However, if column headers are truly variable names, then melting is optional because it not required to make the data tidy.  When a tidy dataset is put into a molten form, that dataset is considered to be in the _narrow form_.  If the same tidy data set is not melted, it is considered to be in the _wide form_.
+When columns headers are themselves values and not variable names, the data is not considered tidy \[[4](#id-refs)\].  In such a case, melting is performed as a part of making the data tidy.  However, if column headers are truly variable names, then melting is optional because it is not required to make the data tidy.  When a tidy dataset is put into a molten form, that dataset is considered to be in the _narrow form_.  If the same tidy data set is not melted, it is considered to be in the _wide form_.
 
 The wide form of the tidy data set was selected as the output form of the table resulting from step 5. processing.  This was done for the following reasons:
 
