@@ -173,8 +173,6 @@ In keeping with the spirit of avoiding the trap of "premature optimization is th
 <pre>
 library(dplyr)
 library(downloader)
-library(LaF)
-library(ffbase)
 
 ## ... other code from run_analysis.R ...
 
