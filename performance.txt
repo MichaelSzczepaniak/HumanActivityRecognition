@@ -223,3 +223,22 @@ downloaded 59.7 MB
 17:52:46 Append descriptive activities: step 3. complete.
 17:52:48 Append subject and make descriptive col names: step 4. complete.
 17:52:48 Summarize variable by subject & activity: step 5. complete.
+
+8/1/2015
+
+> source("run_analysis.R")  # 1 min, 8 sec using just read.table
+> run_analysis()
+18:51:39  Start reading X_test.txt data file into dataframe.
+18:51:41  Finished reading X_test.txt data file into dataframe.
+18:51:41  Start reading X_train.txt data file into dataframe.
+18:51:46  Finished reading X_train.txt data file into dataframe.
+          Start dput of test data...
+18:51:52  Finished dput of xtestdf.R. Start dput of train data.
+18:52:08  Finished dput of xtraindf.R.
+18:52:08 Deparsed HAR X data file creations complete. Start reading...
+18:52:27 reading deparsed HAR dataframes complete...
+18:52:41 addOriginalFeaturesAsHeaders completed.
+18:52:43 Removal of unneeded columns: step 2. complete.
+18:52:45 Append descriptive activities: step 3. complete.
+18:52:47 Append subject and make descriptive col names: step 4. complete.
+18:52:47 Summarize variable by subject & activity: step 5. complete.

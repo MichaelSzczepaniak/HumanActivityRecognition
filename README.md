@@ -1,6 +1,7 @@
 # Human Activity Recognition
 
 ## Contents  
+- [Introduction](#id-intro)
 - [Description](#id-description)  
 - [Running the Analysis](#id-running-the-analysis)  
   - [Simple way to run the analysis script](#id-simple)
@@ -12,6 +13,10 @@
   - [Processed data](#id-processed)
 - [The Tidy Data Set](#id-tidy)
 - [References](#id-refs)
+
+<div id='id-intro'/>
+## Introduction
+One of the most exciting areas in all of data science right now is wearable computing - see for example [this article](http://www.insideactivitytracking.com/data-science-activity-tracking-and-the-battle-for-the-worlds-top-sports-brand/).  Companies like Fitbit, Nike, and Jawbone Up are racing to develop the most advanced algorithms to attract new users.\[[6](#id-refs)\].  The data which this project works with comes from such a study of human activity as described [here](http://archive.ics.uci.edu/ml/datasets/Human+Activity+Recognition+Using+Smartphones)
 
 <div id='id-description'/>
 ## Description
@@ -253,6 +258,42 @@ fastFwfRead <- function(rawDataFilePath, colWidths, colTypes,
 
 The implementation of **fastFwfRead** reduced running the analysis from about 9 minutes down to about 1.5 minutes!
 
+#### Update 8/3/2015
+Turns out that the data did not need to be read in as _fixed width format_ and a call to the R utils function **read.table()** was all that was needed and in fact was a little faster (the benefit of peer reviews!...).  The default analysis still took a little over a minute to run, but this was because it rebuilds the deparsed data files each time.  The latest version of the function that reads the data file looks like this:
+
+<pre>
+## Reads the data from a raw HAR data file and returns a dataframe.
+## testData - TRUE if file to be read is the X_test.txt file
+##            FALSE if the file to be read is the X_train.txt file
+readXFromRawData <- function(testData) {
+    rawDataFilePath <- NULL
+    rowCount <- NULL
+    if(testData) {
+        rawDataFilePath <- paste0(testDir, "/X_test.txt")
+        rowCount <- 2947
+    }
+    else {
+        rawDataFilePath <- paste0(trainDir, "/X_train.txt")
+        rowCount <- 7352
+    }
+    # X_train.txt and X_test.txt files are both fixed width and have
+    # 561 factors (variables). Each value is 15 characters seperated by
+    # a space.
+    #xdata <- read.fwf(file = rawDataFilePath, rep(c(-1, 15), 561)) # slow way
+    
+#     colWidths <- rep(c(1, 15), 561)
+#     colTypes <- rep(c('character', 'numeric'), 561)
+#     keepCols <- seq(2, 1122, 2)
+#     xdata <- fastFwfRead(rawDataFilePath, colWidths, colTypes,
+#                          keepCols, rowCount)
+    # thought I needed to read a fw, but a straight read.table works fine and 
+    # is faster...
+    xdata <- read.table(rawDataFilePath, colClasses = 'numeric')
+    
+    return(xdata)
+}
+</pre>
+
 <div id='id-codebook'/>
 ## Code Book
 The code book for this project is provided in the [**CodeBook.md** file](https://github.com/MichaelSzczepaniak/HumanActivityRecognition/blob/master/CodeBook.md) and describes the following:
@@ -355,4 +396,5 @@ The wide form of the tidy data set was selected as the output form of the table 
 [2] Wickham H (2014). "_Tidy Data_ ". "_Journal of Statistical Software_" **59**(10), page 4.  URL [http://www.jstatsoft.org/v59/i10/paper](http://www.jstatsoft.org/v59/i10/paper)  
 [3] Knuth D E (1974). "_Computer Programming as an art_". "_Communcations of the ACM_" **17**(12), 671.  URL [http://delivery.acm.org/10.1145/370000/361612/a1974-knuth.pdf](http://delivery.acm.org/10.1145/370000/361612/a1974-knuth.pdf)  
 [4] Wickham H (2014). "_Tidy Data_ ". "_Journal of Statistical Software_" **59**(10), pages 5-6.  URL [http://www.jstatsoft.org/v59/i10/paper](http://www.jstatsoft.org/v59/i10/paper)  
-[5] Post by jwijffels at [http://stackoverflow.com/questions/18720036/reading-big-data-with-fixed-width](http://stackoverflow.com/questions/18720036/reading-big-data-with-fixed-width)
+[5] Post by jwijffels at [http://stackoverflow.com/questions/18720036/reading-big-data-with-fixed-width](http://stackoverflow.com/questions/18720036/reading-big-data-with-fixed-width)  
+[6] Leek, J (2015). "Getting and Cleaning Data" course project at (https://class.coursera.org/getdata-030)[https://class.coursera.org/getdata-030]

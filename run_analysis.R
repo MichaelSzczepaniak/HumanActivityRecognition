@@ -231,11 +231,14 @@ readXFromRawData <- function(testData) {
     # a space.
     #xdata <- read.fwf(file = rawDataFilePath, rep(c(-1, 15), 561)) # slow way
     
-    colWidths <- rep(c(1, 15), 561)
-    colTypes <- rep(c('character', 'numeric'), 561)
-    keepCols <- seq(2, 1122, 2)
-    xdata <- fastFwfRead(rawDataFilePath, colWidths, colTypes,
-                         keepCols, rowCount)
+#     colWidths <- rep(c(1, 15), 561)
+#     colTypes <- rep(c('character', 'numeric'), 561)
+#     keepCols <- seq(2, 1122, 2)
+#     xdata <- fastFwfRead(rawDataFilePath, colWidths, colTypes,
+#                          keepCols, rowCount)
+    # thought I needed to read a fw, but a straight read.table works fine and 
+    # is faster...
+    xdata <- read.table(rawDataFilePath, colClasses = 'numeric')
     
     return(xdata)
 }
@@ -357,6 +360,7 @@ appendSubjectColumn <- function(xdata) {
 
 ## High performance FWF reads of X_test.txt and X_train.txt based on:
 ## http://stackoverflow.com/questions/18720036/reading-big-data-with-fixed-width
+## Turns out the a straight read.table worked fine and was actually faster...
 fastFwfRead <- function(rawDataFilePath, colWidths, colTypes,
                         keepCols, rowCount) {
     data.laf <- laf_open_fwf(rawDataFilePath, column_widths=colWidths,
