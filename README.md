@@ -397,4 +397,4 @@ The wide form of the tidy data set was selected as the output form of the table 
 [3] Knuth D E (1974). "_Computer Programming as an art_". "_Communcations of the ACM_" **17**(12), 671.  URL [http://delivery.acm.org/10.1145/370000/361612/a1974-knuth.pdf](http://delivery.acm.org/10.1145/370000/361612/a1974-knuth.pdf)  
 [4] Wickham H (2014). "_Tidy Data_ ". "_Journal of Statistical Software_" **59**(10), pages 5-6.  URL [http://www.jstatsoft.org/v59/i10/paper](http://www.jstatsoft.org/v59/i10/paper)  
 [5] Post by jwijffels at [http://stackoverflow.com/questions/18720036/reading-big-data-with-fixed-width](http://stackoverflow.com/questions/18720036/reading-big-data-with-fixed-width)  
-[6] Leek, J (2015). "Getting and Cleaning Data" course project at (https://class.coursera.org/getdata-030)[https://class.coursera.org/getdata-030]
+[6] Leek, J (2015). "Getting and Cleaning Data" course project at [https://class.coursera.org/getdata-030](https://class.coursera.org/getdata-030)
